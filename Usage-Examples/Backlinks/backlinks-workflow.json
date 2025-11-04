@@ -1,0 +1,206 @@
+{
+  "name": "Backlinks Monitoring & Analysis",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [260, 460],
+      "id": "manual-trigger",
+      "name": "Manual Trigger"
+    },
+    {
+      "parameters": {
+        "resource": "backlinks",
+        "target": "seranking.com",
+        "additionalFields": {
+          "mode": "domain"
+        }
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [480, 460],
+      "id": "get-backlinks-summary",
+      "name": "Get backlinks summary"
+    },
+    {
+      "parameters": {
+        "resource": "backlinks",
+        "operation": "getHistory",
+        "target": "seranking.com",
+        "dateFrom": "2025-10-01",
+        "dateTo": "2025-10-30",
+        "additionalFields": {
+          "mode": "domain",
+          "new_lost_type": "new",
+          "limit": 100
+        }
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [700, 360],
+      "id": "get-new-backlinks",
+      "name": "Get new backlinks"
+    },
+    {
+      "parameters": {
+        "resource": "backlinks",
+        "operation": "getHistory",
+        "target": "seranking.com",
+        "dateFrom": "2025-10-01",
+        "dateTo": "2025-10-30",
+        "additionalFields": {
+          "mode": "domain",
+          "new_lost_type": "lost",
+          "limit": 100
+        }
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [700, 560],
+      "id": "get-lost-backlinks",
+      "name": "Get lost backlinks"
+    },
+    {
+      "parameters": {
+        "resource": "backlinks",
+        "operation": "getRefDomains",
+        "target": "seranking.com",
+        "additionalFields": {
+          "mode": "domain",
+          "limit": 100,
+          "order_by": "domain_inlink_rank"
+        }
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [920, 360],
+      "id": "get-referring-domains",
+      "name": "Get referring domains"
+    },
+    {
+      "parameters": {
+        "resource": "backlinks",
+        "operation": "getAnchors",
+        "target": "seranking.com",
+        "additionalFields": {
+          "mode": "domain",
+          "limit": 50,
+          "order_by": "backlinks"
+        }
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [920, 560],
+      "id": "get-anchor-texts",
+      "name": "Get anchor texts"
+    },
+    {
+      "parameters": {
+        "resource": "backlinks",
+        "operation": "getAuthority",
+        "target": "seranking.com"
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [1140, 360],
+      "id": "get-authority-metrics",
+      "name": "Get authority metrics"
+    },
+    {
+      "parameters": {
+        "resource": "backlinks",
+        "operation": "getHistoryCount",
+        "target": "seranking.com",
+        "dateFrom": "2025-10-01",
+        "dateTo": "2025-10-30",
+        "additionalFields": {
+          "mode": "domain"
+        }
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [1140, 560],
+      "id": "get-daily-history",
+      "name": "Get daily backlinks count"
+    },
+    {
+      "parameters": {
+        "resource": "backlinks",
+        "operation": "getCumulativeHistory",
+        "target": "seranking.com",
+        "dateFrom": "2025-09-01",
+        "dateTo": "2025-10-30",
+        "additionalFields": {
+          "mode": "domain"
+        }
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [1360, 460],
+      "id": "get-cumulative-history",
+      "name": "Get cumulative backlinks history"
+    },
+    {
+      "parameters": {
+        "content": "# Backlinks Monitoring Workflow\n\nThis workflow monitors your backlink profile:\n1. Summary statistics\n2. New & lost backlinks\n3. Referring domains analysis\n4. Anchor text distribution\n5. Authority metrics\n6. Historical trends",
+        "height": 280,
+        "width": 380
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [240, 240],
+      "id": "note-overview",
+      "name": "Workflow Overview"
+    },
+    {
+      "parameters": {
+        "content": "## 📊 Configure Your Domain\n\nUpdate these nodes with your domain:\n- Get backlinks summary\n- Get new/lost backlinks\n- Get referring domains\n- Get anchor texts\n- Get authority metrics\n\nChange 'seranking.com' to your domain",
+        "height": 200,
+        "width": 360,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [240, 620],
+      "id": "note-config",
+      "name": "Configuration Note"
+    }
+  ],
+  "connections": {
+    "Manual Trigger": {
+      "main": [[{ "node": "Get backlinks summary", "type": "main", "index": 0 }]]
+    },
+    "Get backlinks summary": {
+      "main": [
+        [
+          { "node": "Get new backlinks", "type": "main", "index": 0 },
+          { "node": "Get lost backlinks", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "Get new backlinks": {
+      "main": [[{ "node": "Get referring domains", "type": "main", "index": 0 }]]
+    },
+    "Get lost backlinks": {
+      "main": [[{ "node": "Get anchor texts", "type": "main", "index": 0 }]]
+    },
+    "Get referring domains": {
+      "main": [[{ "node": "Get authority metrics", "type": "main", "index": 0 }]]
+    },
+    "Get anchor texts": {
+      "main": [[{ "node": "Get daily backlinks count", "type": "main", "index": 0 }]]
+    },
+    "Get authority metrics": {
+      "main": [[{ "node": "Get cumulative backlinks history", "type": "main", "index": 0 }]]
+    },
+    "Get daily backlinks count": {
+      "main": [[{ "node": "Get cumulative backlinks history", "type": "main", "index": 0 }]]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": []
+}

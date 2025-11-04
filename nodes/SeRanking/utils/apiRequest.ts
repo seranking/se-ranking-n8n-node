@@ -73,45 +73,24 @@ export async function apiRequest(
     // Add body data
     if (Object.keys(body).length > 0 && method !== 'GET') {
         if (body.keywords && Array.isArray(body.keywords)) {
-            // n8n's httpRequest supports FormData-like structure
-            // Build multipart form data body as object with special structure
+            // Build proper multipart/form-data for n8n
+            // n8n's httpRequest helper expects simple key-value pairs
             const formDataBody: Record<string, any> = {};
             
-            // For arrays, n8n expects each value to be added separately
-            // The helper will automatically convert this to multipart/form-data
+            // Add keywords as array - n8n will handle the multipart encoding
             body.keywords.forEach((kw: string, index: number) => {
-                formDataBody[`keywords[${index}]`] = {
-                    value: `"${kw}"`,
-                    options: {
-                        contentType: 'text/plain',
-                    },
-                };
+                formDataBody[`keywords[${index}]`] = kw;
             });
             
-            // Add other fields with proper structure
+            // Add other fields directly without wrapping
             if (body.cols) {
-                formDataBody.cols = {
-                    value: `"${body.cols}"`,
-                    options: {
-                        contentType: 'text/plain',
-                    },
-                };
+                formDataBody.cols = body.cols;
             }
             if (body.sort) {
-                formDataBody.sort = {
-                    value: `"${body.sort}"`,
-                    options: {
-                        contentType: 'text/plain',
-                    },
-                };
+                formDataBody.sort = body.sort;
             }
             if (body.sort_order) {
-                formDataBody.sort_order = {
-                    value: `"${body.sort_order}"`,
-                    options: {
-                        contentType: 'text/plain',
-                    },
-                };
+                formDataBody.sort_order = body.sort_order;
             }
             
             options.body = formDataBody;

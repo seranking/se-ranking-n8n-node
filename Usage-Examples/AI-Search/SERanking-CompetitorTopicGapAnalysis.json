@@ -1,0 +1,1078 @@
+{
+  "name": "SERanking-CompetitorTopicGapAnalysis",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "cc6bdc83-0a3d-4857-973f-dbd2986631b4",
+      "name": "Manual Trigger",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -352,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "fields": {
+          "values": [
+            {
+              "name": "your_domain",
+              "stringValue": "seranking.com"
+            },
+            {
+              "name": "source",
+              "stringValue": "us"
+            },
+            {
+              "name": "scope",
+              "stringValue": "base_domain"
+            },
+            {
+              "name": "competitor_domain",
+              "stringValue": "semrush.com"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f7883cb2-55b8-42ad-8f3e-b84ecd650dd6",
+      "name": "Configuration",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [
+        -128,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "aiSearch",
+        "domain": "={{ $json.your_domain }}",
+        "source": "={{ $json.source }}",
+        "scope": "={{ $json.scope }}"
+      },
+      "id": "afce535c-00fa-4bf8-b675-966e70ba4f42",
+      "name": "Your Domain - ChatGPT",
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        96,
+        -496
+      ],
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "aiSearch",
+        "domain": "={{ $('Configuration').item.json.your_domain }}",
+        "engine": "perplexity",
+        "source": "={{ $('Configuration').item.json.source }}",
+        "scope": "={{ $('Configuration').item.json.scope }}"
+      },
+      "id": "8b978bef-36af-4372-bab2-b6d11f43c191",
+      "name": "Your Domain - Perplexity",
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        96,
+        -112
+      ],
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "aiSearch",
+        "domain": "={{ $('Configuration').item.json.your_domain }}",
+        "engine": "gemini",
+        "source": "={{ $('Configuration').item.json.source }}",
+        "scope": "={{ $('Configuration').item.json.scope }}"
+      },
+      "id": "52ae0303-94e9-425d-8192-a945b73e999e",
+      "name": "Your Domain - Gemini",
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        96,
+        288
+      ],
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "id": "ff120020-8f82-42ff-a60d-72c3f05240e4",
+      "name": "Wait (Rate Limit)",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        -272
+      ],
+      "webhookId": "rate-limit-1"
+    },
+    {
+      "parameters": {
+        "resource": "aiSearch",
+        "domain": "={{ $('Configuration').item.json.competitor_domain }}",
+        "source": "={{ $('Configuration').item.json.source }}",
+        "scope": "={{ $('Configuration').item.json.scope }}"
+      },
+      "id": "88d5ca47-9401-4410-97fa-3caf0ed966a4",
+      "name": "Competitor - ChatGPT",
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        336,
+        -320
+      ],
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "aiSearch",
+        "domain": "={{ $('Configuration').item.json.competitor_domain }}",
+        "engine": "perplexity",
+        "source": "={{ $('Configuration').item.json.source }}",
+        "scope": "={{ $('Configuration').item.json.scope }}"
+      },
+      "id": "f8200f85-4234-4dd8-9803-56530c127bb7",
+      "name": "Competitor - Perplexity",
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        336,
+        48
+      ],
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "aiSearch",
+        "domain": "={{ $('Configuration').item.json.competitor_domain }}",
+        "engine": "gemini",
+        "source": "={{ $('Configuration').item.json.source }}",
+        "scope": "={{ $('Configuration').item.json.scope }}"
+      },
+      "id": "90b82482-8855-41ea-a07d-2b4c7f409a49",
+      "name": "Competitor - Gemini",
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        528,
+        208
+      ],
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "d5ab4fba-a1b5-4ce0-b5b4-bdc1da298576",
+      "name": "Merge AI Visibility Data",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        768,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Calculate AI Search Gap Analysis\nconst config = $('Configuration').first().json;\nconst yourData = [\n  $('Your Domain - ChatGPT').first().json,\n  $('Your Domain - Perplexity').first().json,\n  $('Your Domain - Gemini').first().json\n];\nconst compData = [\n  $('Competitor - ChatGPT').first().json,\n  $('Competitor - Perplexity').first().json,\n  $('Competitor - Gemini').first().json\n];\n\nconst engines = ['chatgpt', 'perplexity', 'gemini'];\nconst results = [];\n\nengines.forEach((engine, i) => {\n  const your = yourData[i]?.summary || {};\n  const comp = compData[i]?.summary || {};\n  \n  const yourLinkPresence = your.link_presence?.current || 0;\n  const compLinkPresence = comp.link_presence?.current || 0;\n  const yourAvgPos = your.average_position?.current || 0;\n  const compAvgPos = comp.average_position?.current || 0;\n  const yourTraffic = your.ai_opportunity_traffic?.current || 0;\n  const compTraffic = comp.ai_opportunity_traffic?.current || 0;\n  \n  // Calculate gaps (negative = competitor is better)\n  const linkPresenceGap = yourLinkPresence - compLinkPresence;\n  const avgPosGap = compAvgPos - yourAvgPos; // Lower is better, so flip\n  const trafficGap = yourTraffic - compTraffic;\n  \n  // Opportunity Score (higher = bigger opportunity to improve)\n  // Formula: Weighted average of gaps (negative gaps = opportunities)\n  const opportunityScore = Math.round(\n    (Math.abs(Math.min(linkPresenceGap, 0)) * 0.4) +\n    (Math.abs(Math.min(avgPosGap, 0)) * 0.3) +\n    (Math.abs(Math.min(trafficGap, 0)) * 0.3)\n  );\n  \n  results.push({\n    json: {\n      analysis_date: new Date().toISOString().split('T')[0],\n      your_domain: config.your_domain,\n      competitor_domain: config.competitor_domain,\n      engine: engine,\n      \n      // Your metrics\n      your_link_presence: yourLinkPresence,\n      your_avg_position: yourAvgPos.toFixed(2),\n      your_ai_traffic: yourTraffic,\n      \n      // Competitor metrics\n      comp_link_presence: compLinkPresence,\n      comp_avg_position: compAvgPos.toFixed(2),\n      comp_ai_traffic: compTraffic,\n      \n      // Gap analysis\n      link_presence_gap: linkPresenceGap,\n      avg_position_gap: avgPosGap.toFixed(2),\n      traffic_gap: trafficGap,\n      \n      // Opportunity scoring\n      opportunity_score: opportunityScore,\n      priority: opportunityScore > 100 ? 'HIGH' : opportunityScore > 50 ? 'MEDIUM' : 'LOW',\n      \n      // Status flags\n      is_competitor_winning: linkPresenceGap < 0 || avgPosGap < 0,\n      needs_immediate_action: opportunityScore > 100\n    }\n  });\n});\n\nreturn results;"
+      },
+      "id": "f78d9bbb-dc5d-47b7-ad31-c932b0d0b568",
+      "name": "Calculate AI Gaps",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        992,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "aiSearch",
+        "operation": "getPromptsByTarget",
+        "domain": "={{ $('Configuration').item.json.competitor_domain }}",
+        "source": "={{ $('Configuration').item.json.source }}",
+        "scope": "={{ $('Configuration').item.json.scope }}",
+        "additionalFields": {
+          "sort": "volume",
+          "sortOrder": "desc",
+          "limit": 50
+        }
+      },
+      "id": "419860e9-cca9-4ee4-a6ba-4f00651749e8",
+      "name": "Competitor Top Prompts",
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        1264,
+        -208
+      ],
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getKeywords",
+        "domain": "={{ $('Configuration').item.json.competitor_domain }}",
+        "source": "={{ $('Configuration').item.json.source }}",
+        "additionalFields": {
+          "limit": 100,
+          "orderField": "traffic",
+          "orderType": "desc",
+          "volumeFrom": 500,
+          "positionFrom": 1,
+          "positionTo": 20
+        }
+      },
+      "id": "15c2a241-cc91-4488-8dd4-2cd94f395c8c",
+      "name": "Competitor Top Keywords",
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        112
+      ],
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "backlinks",
+        "target": "={{ $('Configuration').item.json.competitor_domain }}",
+        "additionalFields": {
+          "historical": true
+        }
+      },
+      "id": "a940ef18-5896-4245-8252-8dc700e2fa44",
+      "name": "Competitor Backlink Authority",
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        1376,
+        288
+      ],
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract top competitor prompts and format for keyword research\nconst input = $input.first().json;\nconst prompts = input.prompts || [];\n\n// Sort by volume (even if 0) and take top prompts\n// Filter can be adjusted based on actual data characteristics\nconst topPrompts = prompts\n  .filter(p => p.prompt && p.prompt.trim().length > 0) // Just check prompt exists\n  .slice(0, 20) // Take top 20\n  .map(p => p.prompt);\n\nreturn [{\n  json: {\n    keywords: topPrompts,\n    count: topPrompts.length,\n    original_total: input.total || 0\n  }\n}];"
+      },
+      "id": "4a90d6f9-4284-4bee-bdeb-200e9c7feb95",
+      "name": "Extract Top Prompts",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        -208
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Extract competitor keywords that you don't rank for\nconst keywords = $input.all();\nconst topKeywords = keywords\n  .map(k => k.json)\n  .filter(k => k.volume > 500 && k.position <= 10) // High-value, top-ranking\n  .slice(0, 30)\n  .map(k => k.keyword);\n\nreturn [{\n  json: {\n    keywords: topKeywords,\n    count: topKeywords.length\n  }\n}];"
+      },
+      "id": "2a3cda03-4c92-4513-97af-9179d5128bc1",
+      "name": "Extract Top Keywords",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1584,
+        -16
+      ]
+    },
+    {
+      "parameters": {
+        "resource": "keywordResearch",
+        "source": "={{ $('Configuration').first().json.source }}",
+        "keywords": "=seo",
+        "additionalFields": {
+          "cols": [
+            "keyword",
+            "volume",
+            "cpc",
+            "competition",
+            "difficulty"
+          ],
+          "sort": "volume",
+          "sortOrder": "desc"
+        }
+      },
+      "id": "2890f24e-30f7-4f88-bbda-1acf076963fd",
+      "name": "Gap Keywords - Full Metrics",
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        -288
+      ],
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "696d0894-14fb-4d58-8a37-82721a43c303",
+      "name": "Merge All Intelligence",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        2272,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Final Opportunity Scoring & Prioritization\nconst aiGaps = $('Calculate AI Gaps').all();\nconst keywordMetrics = $('Gap Keywords - Full Metrics').all();\nconst backlinkData = $('Competitor Backlink Authority').first().json;\nconst config = $('Configuration').first().json;\n\n// Competitor authority context\nconst compAuthority = {\n  total_backlinks: backlinkData.backlinks_info?.backlinks || 0,\n  referring_domains: backlinkData.backlinks_info?.refdomains || 0,\n  domain_inlink_rank: backlinkData.backlinks_info?.domain_inlink_rank || 0\n};\n\nconst opportunities = [];\n\n// Process AI gaps by engine\naiGaps.forEach(gap => {\n  const g = gap.json;\n  if (g.is_competitor_winning) {\n    opportunities.push({\n      type: 'AI_VISIBILITY_GAP',\n      engine: g.engine,\n      priority: g.priority,\n      opportunity_score: g.opportunity_score,\n      metric: 'Link Presence',\n      your_value: g.your_link_presence,\n      comp_value: g.comp_link_presence,\n      gap: g.link_presence_gap,\n      action: g.link_presence_gap < -50 ? 'URGENT: Create AI-optimized content' : 'Improve content for AI citations'\n    });\n  }\n});\n\n// Process keyword gaps\nkeywordMetrics.forEach(kw => {\n  const k = kw.json;\n  if (k.volume > 1000 && k.difficulty < 70) {\n    // Calculate opportunity score\n    const opportunityScore = Math.round(\n      (k.volume * 0.5) + \n      ((100 - k.difficulty) * 0.3) +\n      (k.cpc * 10)\n    );\n    \n    opportunities.push({\n      type: 'KEYWORD_GAP',\n      keyword: k.keyword,\n      priority: opportunityScore > 5000 ? 'HIGH' : opportunityScore > 2000 ? 'MEDIUM' : 'LOW',\n      opportunity_score: opportunityScore,\n      volume: k.volume,\n      difficulty: k.difficulty,\n      cpc: k.cpc,\n      estimated_traffic: Math.round(k.volume * 0.15), // Assume 15% CTR at top position\n      action: k.difficulty < 40 ? 'Quick Win: Create optimized content' : 'Long-term: Build authority'\n    });\n  }\n});\n\n// Sort all opportunities by score\nopportunities.sort((a, b) => b.opportunity_score - a.opportunity_score);\n\n// Add metadata\nconst finalReport = opportunities.slice(0, 50).map((opp, i) => ({\n  json: {\n    rank: i + 1,\n    analysis_date: new Date().toISOString().split('T')[0],\n    your_domain: config.your_domain,\n    competitor_domain: config.competitor_domain,\n    competitor_authority: compAuthority.domain_inlink_rank,\n    competitor_backlinks: compAuthority.total_backlinks,\n    competitor_ref_domains: compAuthority.referring_domains,\n    ...opp\n  }\n}));\n\nreturn finalReport;"
+      },
+      "id": "145f275b-ddd7-4fb1-9a59-0e3a5d0d130a",
+      "name": "Final Opportunity Scoring",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2496,
+        16
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1R4GxH028s6fccOMCPPVHiT6mqiFOSDeHwLI1UMfBOPM",
+          "mode": "list",
+          "cachedResultName": "SE Ranking - Competitor Topic Gap Analysis",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R4GxH028s6fccOMCPPVHiT6mqiFOSDeHwLI1UMfBOPM/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1R4GxH028s6fccOMCPPVHiT6mqiFOSDeHwLI1UMfBOPM/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "rank",
+              "displayName": "rank",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "analysis_date",
+              "displayName": "analysis_date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "your_domain",
+              "displayName": "your_domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "competitor_domain",
+              "displayName": "competitor_domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "competitor_authority",
+              "displayName": "competitor_authority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "competitor_backlinks",
+              "displayName": "competitor_backlinks",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "competitor_ref_domains",
+              "displayName": "competitor_ref_domains",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "opportunity_score",
+              "displayName": "opportunity_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "volume",
+              "displayName": "volume",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "difficulty",
+              "displayName": "difficulty",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cpc",
+              "displayName": "cpc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estimated_traffic",
+              "displayName": "estimated_traffic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "action",
+              "displayName": "action",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "engine",
+              "displayName": "engine",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "metric",
+              "displayName": "metric",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "your_value",
+              "displayName": "your_value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "comp_value",
+              "displayName": "comp_value",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "gap",
+              "displayName": "gap",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "b4b3690c-caf6-4d06-be05-3b5d5e743513",
+      "name": "Export to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        2720,
+        16
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "K2iUXQtuUAF8v9IT",
+          "name": "Google Sheets account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "id": "4592b017-87d4-4cf9-9b60-626f6341da56",
+      "name": "Wait (Rate Limit)1",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        96,
+        112
+      ],
+      "webhookId": "rate-limit-1"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "id": "8e9aa085-0c99-401b-9219-07100f308aaa",
+      "name": "Wait (Rate Limit)2",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        336,
+        -496
+      ],
+      "webhookId": "rate-limit-1"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "id": "9938db51-b052-4143-a2da-0367c7bb26a0",
+      "name": "Wait (Rate Limit)3",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        336,
+        -128
+      ],
+      "webhookId": "rate-limit-1"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "id": "11d61737-cd81-464e-9d9d-0b066ceba278",
+      "name": "Wait (Rate Limit)4",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        320,
+        256
+      ],
+      "webhookId": "rate-limit-1"
+    },
+    {
+      "parameters": {
+        "amount": 3
+      },
+      "id": "4bef3e06-5c0c-4a68-91bb-dde1159db0a3",
+      "name": "Wait (Rate Limit)5",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1248,
+        0
+      ],
+      "webhookId": "rate-limit-1"
+    },
+    {
+      "parameters": {},
+      "id": "b18d4cdd-586d-4968-8efa-11151b0dfd11",
+      "name": "Wait (Rate Limit)6",
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1072,
+        -224
+      ],
+      "webhookId": "rate-limit-1"
+    },
+    {
+      "parameters": {},
+      "id": "052541dd-8f95-4a35-a384-0383c635614f",
+      "name": "Merge All Intelligence1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2.1,
+      "position": [
+        1808,
+        -112
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Combine prompts and keywords into a single unified list\nconst allInputs = $input.all();\n\n// Extract all keyword arrays\nconst allKeywords = [];\n\nallInputs.forEach(item => {\n  if (item.json.keywords && Array.isArray(item.json.keywords)) {\n    allKeywords.push(...item.json.keywords);\n  }\n});\n\n// Remove duplicates (case-insensitive) and clean\nconst uniqueKeywords = [...new Set(\n  allKeywords.map(kw => kw.toLowerCase().trim())\n)];\n\n// Filter out inappropriate/adult content keywords\nconst inappropriateTerms = [\n  'porn', 'xxx', 'sex', 'adult', 'tube', 'leaked', 'incest', \n  'coomer', 'ashemaletube', 'missav', 'xpaja', 'javmost', \n  'sickjunk', 'xfreehd', 'celebjihad', 'ghettotube', 'bbw', \n  'boundhub', 'potnhub', 'pormhub', 'xorgasmo', 'ukdevilz',\n  'ero', 'thots', 'anonib', 'scrolller', 'webtoon', 'whoer',\n  'enf', 'cmnf', 'shahvani', 'leakedzone', 'sickjunk'\n];\n\nconst cleanKeywords = uniqueKeywords.filter(kw => {\n  return !inappropriateTerms.some(term => kw.includes(term));\n});\n\n// Additional validation - ensure keywords are valid strings\nconst validKeywords = cleanKeywords.filter(kw => {\n  return kw && \n         kw.length > 0 && \n         kw.length < 200 && // SE Ranking limit\n         /^[a-zA-Z0-9\\s\\-\\?\\.]+$/.test(kw); // Only alphanumeric, spaces, hyphens, question marks, periods\n});\n\nreturn [{\n  json: {\n    keywords: validKeywords.slice(0, 50), // Limit to 50 for API efficiency\n    total_count: validKeywords.length,\n    filtered_out: uniqueKeywords.length - validKeywords.length,\n    prompts_count: allInputs[0]?.json?.count || 0,\n    competitor_keywords_count: allInputs[1]?.json?.count || 0\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2016,
+        -112
+      ],
+      "id": "327166b1-2461-41e6-aeae-8ed017b9fccf",
+      "name": "Code in JavaScript"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Manual Trigger": {
+      "main": [
+        [
+          {
+            "node": "Configuration",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Configuration": {
+      "main": [
+        [
+          {
+            "node": "Your Domain - ChatGPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Your Domain - ChatGPT": {
+      "main": [
+        [
+          {
+            "node": "Wait (Rate Limit)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Your Domain - Perplexity": {
+      "main": [
+        [
+          {
+            "node": "Wait (Rate Limit)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Your Domain - Gemini": {
+      "main": [
+        [
+          {
+            "node": "Wait (Rate Limit)2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait (Rate Limit)": {
+      "main": [
+        [
+          {
+            "node": "Your Domain - Perplexity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competitor - ChatGPT": {
+      "main": [
+        [
+          {
+            "node": "Wait (Rate Limit)3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competitor - Perplexity": {
+      "main": [
+        [
+          {
+            "node": "Merge AI Visibility Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait (Rate Limit)4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge AI Visibility Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate AI Gaps",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate AI Gaps": {
+      "main": [
+        [
+          {
+            "node": "Competitor Backlink Authority",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait (Rate Limit)6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competitor Top Prompts": {
+      "main": [
+        [
+          {
+            "node": "Extract Top Prompts",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Wait (Rate Limit)5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competitor Top Keywords": {
+      "main": [
+        [
+          {
+            "node": "Extract Top Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Top Prompts": {
+      "main": [
+        [
+          {
+            "node": "Merge All Intelligence1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Top Keywords": {
+      "main": [
+        [
+          {
+            "node": "Merge All Intelligence1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Gap Keywords - Full Metrics": {
+      "main": [
+        [
+          {
+            "node": "Merge All Intelligence",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competitor Backlink Authority": {
+      "main": [
+        [
+          {
+            "node": "Merge All Intelligence",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge All Intelligence": {
+      "main": [
+        [
+          {
+            "node": "Final Opportunity Scoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Final Opportunity Scoring": {
+      "main": [
+        [
+          {
+            "node": "Export to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Competitor - Gemini": {
+      "main": [
+        [
+          {
+            "node": "Merge AI Visibility Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Wait (Rate Limit)1": {
+      "main": [
+        [
+          {
+            "node": "Your Domain - Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait (Rate Limit)2": {
+      "main": [
+        [
+          {
+            "node": "Competitor - ChatGPT",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait (Rate Limit)3": {
+      "main": [
+        [
+          {
+            "node": "Competitor - Perplexity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait (Rate Limit)4": {
+      "main": [
+        [
+          {
+            "node": "Competitor - Gemini",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait (Rate Limit)5": {
+      "main": [
+        [
+          {
+            "node": "Competitor Top Keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait (Rate Limit)6": {
+      "main": [
+        [
+          {
+            "node": "Competitor Top Prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge All Intelligence1": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Gap Keywords - Full Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "147921dc-d239-4ef2-b614-1dfff4fd6e3c",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1183d366d4439b0dc8255366e7a99e14405a4b582a61d278891dceb1aebf30da"
+  },
+  "id": "IkIGhbu2CVEMUkwd",
+  "tags": []
+}

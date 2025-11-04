@@ -37,7 +37,24 @@ export async function DomainAnalysisOperations(
 			if (additionalFields.showZonesList !== undefined) {
 				params.show_zones_list = additionalFields.showZonesList ? 1 : 0;
 			}
-			break;
+			
+			// Make API request
+			const response = await apiRequest.call(this, method, endpoint, {}, params, index);
+			
+			// Add domain to response for identification
+			if (Array.isArray(response)) {
+				return response.map(item => ({
+					...item,
+					_domain: validateDomain(domain)
+				}));
+			} else if (typeof response === 'object' && response !== null) {
+				return {
+					...response,
+					_domain: validateDomain(domain)
+				};
+			}
+			
+			return response;
 		}
 
 		case 'getOverviewHistory': {

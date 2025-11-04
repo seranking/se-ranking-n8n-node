@@ -269,11 +269,31 @@ Monitor how often your brand appears in AI-powered search engines with automated
 
 **Best For:** Marketing teams tracking AI SEO performance, Brand managers monitoring AI visibility
 
-📁 [View Full Guide & Download Workflow →](./Usage-Examples/AI-Search)
+📂 [View Full Guide & Download Workflow →](./Usage-Examples/AI-Search)
 
 ---
 
-### 🔗 Example 2: Backlinks Monitoring & Analysis
+### 🎯 Example 2: Competitor Topic Gap Analysis
+
+**Identify content opportunities by analyzing where competitors outrank you in AI search and traditional SEO**
+
+Comprehensive competitive analysis combining AI visibility gaps with traditional SEO keyword gaps.
+
+**What You'll Get:**
+
+- AI visibility gaps across ChatGPT, Perplexity, and Gemini
+- Keyword gaps with search volume and difficulty
+- Competitor backlink authority metrics
+- Prioritized opportunities with HIGH/MEDIUM/LOW scoring
+- Actionable recommendations for each gap
+
+**Best For:** Content strategists planning editorial calendars, SEO teams doing competitive intelligence
+
+📂 [View Full Guide & Download Workflow →](./Usage-Examples/AI-Search)
+
+---
+
+### 🔗 Example 3: Backlinks Monitoring & Analysis
 
 **Track new/lost backlinks, monitor domain authority, and analyze anchor text distribution**
 
@@ -289,11 +309,11 @@ Automatically monitor backlink portfolio health with daily tracking and alerts f
 
 **Best For:** SEO agencies managing client backlink portfolios, In-house SEO teams tracking link-building campaigns
 
-📁 [View Full Guide & Download Workflow →](./Usage-Examples/Backlinks)
+📂 [View Full Guide & Download Workflow →](./Usage-Examples/Backlinks)
 
 ---
 
-### 📊 Example 3: Domain Analysis Data Processor
+### 📊 Example 4: Domain Analysis Data Processor
 
 **Transform SE Ranking API data into structured Google Sheets reports**
 
@@ -305,14 +325,15 @@ Automatically process and organize domain analysis data with intelligent type de
 - Domain summary with organic vs. paid breakdown
 - Keywords analysis with positions and difficulty
 - Competitor insights and gap analysis
+- Multi-domain comparison with worldwide traffic data
 
 **Best For:** SEO agencies managing multiple clients, Enterprise teams tracking regional performance
 
-📁 [View Full Guide & Download Workflow →](./Usage-Examples/Domain-Analysis)
+📂 [View Full Guide & Download Workflow →](./Usage-Examples/Domain-Analysis)
 
 ---
 
-### 🔍 Example 4: Keyword Research Automation
+### 🔍 Example 5: Keyword Research Automation
 
 **Automate comprehensive keyword research with trend analysis**
 
@@ -327,11 +348,11 @@ Build an automated keyword intelligence pipeline with historical tracking and SE
 
 **Best For:** Content strategists planning editorial calendars, SEO specialists doing competitor research
 
-📁 [View Full Guide & Download Workflow →](./Usage-Examples/Keyword-Research)
+📂 [View Full Guide & Download Workflow →](./Usage-Examples/Keyword-Research)
 
 ---
 
-### 🔧 Example 5: Website Audit Automation
+### 🔧 Example 6: Website Audit Automation
 
 **Automatically crawl sites, detect issues, and generate reports**
 
@@ -346,7 +367,7 @@ Schedule regular technical SEO audits and get alerts when critical issues are de
 
 **Best For:** Development teams doing pre-launch checks, SEO consultants managing multiple client sites
 
-📁 [View Full Guide & Download Workflow →](./Usage-Examples/Website-Audit)
+📂 [View Full Guide & Download Workflow →](./Usage-Examples/Website-Audit)
 
 ---
 
@@ -686,35 +707,68 @@ n8n-nodes-seranking/
 │       ├── SeRanking.node.ts                                     # Main node definition
 │       ├── dataApi/
 │       │   ├── operations/
-│       │   ├── AiSearchOperations.ts                             # AI Search operations logic
-│       │   ├── DomainAnalysisOperations.ts                       # Domain Analysis operations logic
-│       │   └── KeywordResearchOperations.ts                      # Keyword Research operations logic
+│       │   │   ├── AiSearchOperations.ts                         # AI Search operations logic
+│       │   │   ├── BacklinksOperations.ts                        # Backlinks operations logic
+│       │   │   ├── DomainAnalysisOperations.ts                   # Domain Analysis operations logic
+│       │   │   ├── KeywordResearchOperations.ts                  # Keyword Research operations logic
+│       │   │   └── WebsiteAuditOperations.ts                     # Website Audit operations logic
 │       │   └── descriptions/
-│       │   ├── AiSearchDescription.ts                            # AI Search UI definitions
-│       │   ├── DomainAnalysisDescription.ts                      # Domain Analysis UI definitions
-│       │   └── KeywordResearchDescription.ts                     # Keyword Research UI definitions
+│       │       ├── AiSearchDescription.ts                        # AI Search UI definitions
+│       │       ├── BacklinksDescription.ts                       # Backlinks UI definitions
+│       │       ├── DomainAnalysisDescription.ts                  # Domain Analysis UI definitions
+│       │       ├── KeywordResearchDescription.ts                 # Keyword Research UI definitions
+│       │       └── WebsiteAuditDescription.ts                    # Website Audit UI definitions
 │       └── utils/
 │           ├── validators.ts                                     # Input validators
 │           └── apiRequest.ts                                     # API request handler
-├── Usage Examples/
-│   └── AI Search/
-│       ├── AIVisibilityTracker.json                              # Example 1: Monitor AI Visibility Across Engines
-│       ├── AIVisibilityTrackerResults.xlsx                       # Example 1 Results
-│       ├── README.md
-│   └── Backlinks/
-│       ├── Backlinks-Monitoring&Analysis.json                    # Example 2: Backlinks - Monitoring & Analysis
-│       ├── README.md
-│   └── Domain Analysis/
-│       ├── DomainAnalysisMulti-FormatProcessor.json              # Example 3: Domain Analysis Multi-Format Processor
-│       ├── DomainAnalysisMulti-FormatProcessor.xlsx              # Example 3 Results
-│       ├── README.md
-│   └── Keyword Research/
-│       ├── KeywordResearch→GoogleSheetsPipeline.json              # Example 4: Keyword Research → Google Sheets Pipeline
-│       ├── KeywordResearch→GoogleSheetsPipeline.xlsx              # Example 4 Results
-│       ├── README.md
-│   └── Website=Audit/
-│       ├── Website=Audit-Technical-SEO-Monitor.json              # Example 5: Website Audit - Technical SEO Monitor
-│       ├── README.md
+│
+├── Usage-Examples/
+│   ├── AI-Search/
+│   │   ├── AIVisibilityTracker.json                              # Workflow 1: AI Visibility Tracker
+│   │   ├── AIVisibilityTrackerResults.xlsx                       # Workflow 1 Results
+│   │   ├── SERanking-CompetitorTopicGapAnalysis.json             # Workflow 2: Competitor Topic Gap Analysis
+│   │   ├── SE Ranking - Competitor Topic Gap Analysis.xlsx       # Workflow 2 Results
+│   │   └── README.md                                             # AI Search workflows documentation
+│   │
+│   ├── Backlinks/
+│   │   ├── Backlinks-Monitoring&Analysis.json                    # Backlinks monitoring workflow
+│   │   └── README.md                                             # Backlinks workflow documentation
+│   │
+│   ├── Domain-Analysis/
+│   │   ├── DomainAnalysisMulti-FormatProcessor.json              # Workflow 1: Multi-Format Data Processor
+│   │   ├── DomainAnalysisMulti-FormatProcessor.xlsx              # Workflow 1 Results
+│   │   ├── DomainTraffic&CompetitorAnalysis.json                 # Workflow 2: Multi-Domain Traffic Analysis
+│   │   ├── DomainTraffic&CompetitorAnalysis.xlsx                 # Workflow 2 Results
+│   │   ├── Get_Regional_DB_Overview.jpg                          # Screenshot: Regional Overview
+│   │   ├── Get_Worldwide_Aggregate.jpg                           # Screenshot: Worldwide Aggregate
+│   │   ├── Get_Domain_Keywords.jpg                               # Screenshot: Keywords Analysis
+│   │   ├── Get_Competitors.jpg                                   # Screenshot: Competitors
+│   │   ├── Get keywords comparison Organic Common Keywords.jpg   # Screenshot: Keywords Comparison
+│   │   ├── Get keywords comparison Organic Keyword Gap.jpg       # Screenshot: Organic Gap
+│   │   ├── Get keywords comparison Paid Keyword Gap.jpg          # Screenshot: Paid Gap
+│   │   ├── Get keywords comparison Paid.jpg                      # Screenshot: Paid Comparison
+│   │   ├── Get overview history Organic.jpg                      # Screenshot: Organic History
+│   │   ├── Get overview history Paid.jpg                         # Screenshot: Paid History
+│   │   ├── Get paid ads for domain.jpg                           # Screenshot: Domain Ads
+│   │   ├── Get paid ads for keyword.jpg                          # Screenshot: Keyword Ads
+│   │   ├── Get audit links.png                                   # Screenshot: Audit Links
+│   │   ├── Get crawled pages.png                                 # Screenshot: Crawled Pages
+│   │   ├── Get issues for URL.png                                # Screenshot: URL Issues
+│   │   └── README.md                                             # Domain Analysis workflows documentation
+│   │
+│   ├── Keyword-Research/
+│   │   ├── KeywordResearch→GoogleSheetsPipeline.json             # Keyword research workflow
+│   │   ├── KeywordResearch→GoogleSheetsPipeline.xlsx             # Workflow results
+│   │   ├── Get_Similar_Keywords.jpg                              # Screenshot: Similar Keywords
+│   │   ├── Get_Related_Keywords.jpg                              # Screenshot: Related Keywords
+│   │   ├── Get_Question_Keywords.jpg                             # Screenshot: Question Keywords
+│   │   ├── Get_Longtail_Keywords.jpg                             # Screenshot: Longtail Keywords
+│   │   └── README.md                                             # Keyword Research workflow documentation
+│   │
+│   └── Website-Audit/
+│       ├── Website-Audit-Technical-SEO-Monitor.json              # Website audit workflow
+│       └── README.md                                             # Website Audit workflow documentation
+│
 ├── package.json
 ├── package-lock.json
 ├── tsconfig.json
