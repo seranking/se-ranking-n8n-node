@@ -399,7 +399,7 @@ For detailed API specifications, visit [SE Ranking API Documentation](https://se
 
 ## Version History
 
-### v1.2.0 (Current)
+### v1.2.3 (Current)
 
 - ✅ Complete AI Search resource (4 operations)
 - ✅ **NEW: Complete Backlinks resource (25 operations)**
