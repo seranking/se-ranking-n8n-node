@@ -1,0 +1,667 @@
+# SERP Classic - Location-Based Rank Tracking
+
+## Overview
+Automate keyword rank tracking across search engines with SE Ranking's SERP Classic API. This workflow demonstrates location-based SERP tracking for local businesses, with automated data collection and Google Sheets integration. Perfect for monitoring local search visibility and tracking competitor rankings over time.
+
+## What You'll Get
+- **Position Tracking** - Keyword rankings across search engines and devices
+- **Location-Specific Results** - City/region-level SERP data
+- **SERP Features** - Featured snippets, local pack, and rich results detection
+- **Competitor Analysis** - Track who's ranking for your target keywords
+- **Historical Tracking** - Automated data collection with timestamps
+- **Export-Ready Reports** - Direct integration with Google Sheets
+
+## Use Cases
+- **Local SEO Monitoring** - Track rankings in specific cities/regions
+- **Multi-Location Businesses** - Monitor performance across different areas
+- **Competitor Tracking** - Identify who's ranking for target keywords
+- **SERP Feature Analysis** - Track featured snippets and rich results
+- **Client Reporting** - Automated rank tracking for agencies
+
+## Best For
+- Local businesses (restaurants, retail, services) tracking city-level rankings
+- SEO agencies managing multi-location clients
+- E-commerce businesses monitoring regional performance
+- Marketing teams tracking competitive landscape
+
+---
+
+## Setup Instructions
+
+### Prerequisites
+- n8n installed (version 1.0.0 or higher)
+- SE Ranking API credentials ([Get API Token](https://online.seranking.com/admin.api.dashboard.html))
+- Google Sheets account (for data export)
+- SE Ranking SERP Classic subscription
+
+### Installation Steps
+
+1. **Import the Workflow**
+   - Download `Gelato-Small-Towns-Amsterdam-Area.json` from this folder
+   - In n8n: **Workflows → Import from File**
+   - Select the downloaded JSON file
+
+2. **Configure SE Ranking Credentials**
+   - Click any SE Ranking node
+   - Select **Create New Credential**
+   - Enter your **API Token**
+   - Select **Data API** as API Type
+   - Click **Save**
+
+3. **Configure Google Sheets Integration**
+   - Click the "Append or update row in sheet" node
+   - Connect your Google Sheets account
+   - Create a new spreadsheet or select existing one
+   - The workflow will auto-map columns
+
+4. **Customize Search Parameters**
+   ```javascript
+   // In "Get SERP locations" node:
+   {
+     "countryCode": "NL",        // Country code (NL, US, UK, etc.)
+     "q": "Amsterdam"            // City name for location search
+   }
+
+   // In "Add SERP tasks" node:
+   {
+     "searchEngine": "google",   // Search engine (google, bing, etc.)
+     "device": "desktop",        // Device (desktop, mobile, tablet)
+     "languageCode": "nl",       // Language code (nl, en, fr, etc.)
+     "locationId": 26786,        // Location ID from previous step
+     "keywords": "best gelato"   // Keywords (newline or comma-separated)
+   }
+   ```
+
+5. **Set Schedule (Optional)**
+   - Replace Manual Trigger with Schedule Trigger
+   - Recommended: Daily (every morning at 8:00 AM)
+   - For competitive keywords: Twice daily
+
+---
+
+## Workflow Components
+
+### 1. Get SERP Locations
+**Node**: `Get SERP locations`
+
+Find available location IDs for your target city or region.
+
+**Parameters**:
+- `countryCode`: Two-letter country code (NL, US, UK, FR, DE, etc.)
+- `q`: City or region name (e.g., "Amsterdam", "New York", "London")
+
+**Example Response**:
+```json
+{
+  "id": 26786,
+  "location_name": "Amsterdam",
+  "country_code": "NL",
+  "location_type": "City"
+}
+```
+
+**Pro Tip**: Save location IDs for frequently tracked locations to skip this step in future runs.
+
+### 2. Add SERP Tasks
+**Node**: `Add SERP tasks`
+
+Create SERP tracking tasks for your target keywords.
+
+**Configuration**:
+```javascript
+{
+  "searchEngine": "google",     // Required: google, bing, yahoo, etc.
+  "device": "desktop",          // Required: desktop, mobile, tablet
+  "languageCode": "nl",         // Required: Language code
+  "locationId": 26786,          // Required: From Get Locations
+  "keywords": "best gelato\nice cream near me\ngelato shop",  // Up to 1,000 keywords
+  "tag": "amsterdam-gelato"     // Optional: Tag for grouping
+}
+```
+
+**Keyword Formats**:
+- Newline-separated: `keyword1\nkeyword2\nkeyword3`
+- Comma-separated: `keyword1, keyword2, keyword3`
+- Max 1,000 keywords per request
+- Each keyword ≤ 255 characters
+
+**Response**:
+```json
+{
+  "task_id": 12345
+}
+```
+
+### 3. Get SERP Results (with Retry Logic)
+**Nodes**: `Get SERP results`, `If`, `Wait1`
+
+Poll for task completion and retrieve SERP data.
+
+**How It Works**:
+1. Request SERP results using `task_id`
+2. Check if status is "Processing"
+3. If processing: Wait 30 seconds and retry
+4. If complete: Process results
+
+**Status Response** (Processing):
+```json
+{
+  "status": "processing"
+}
+```
+
+**Completed Response**:
+```json
+{
+  "request_metadata": {
+    "task_id": 12345,
+    "keyword": "best gelato",
+    "search_engine": "google",
+    "device": "desktop",
+    "location_id": 26786,
+    "language_code": "nl"
+  },
+  "results": [
+    {
+      "position": 1,
+      "type": "organic",
+      "url": "https://example.com/gelato",
+      "domain": "example.com",
+      "title": "Best Gelato in Amsterdam - Example Gelateria",
+      "description": "Discover authentic Italian gelato...",
+      "serp_features": ["featured_snippet"],
+      "highlighted_terms": ["best", "gelato"]
+    }
+  ]
+}
+```
+
+### 4. Process SERP Data
+**Node**: `Code in JavaScript`
+
+Transform raw SERP data into structured, analysis-ready format.
+
+**Extracted Fields**:
+- `timestamp` - Data collection time
+- `task_id` - Task identifier
+- `keyword` - Searched keyword
+- `search_engine` - Search engine used
+- `device` - Device type (desktop/mobile/tablet)
+- `location_id` - Location ID
+- `language_code` - Language code
+- `position` - Ranking position (1-100)
+- `type` - Result type (organic, paid, local, etc.)
+- `rank_absolute` - Absolute position including SERP features
+- `domain` - Domain name
+- `url` - Full URL
+- `visible_url` - Display URL from SERP
+- `title` - Page title (truncated to 200 chars)
+- `description` - Meta description (truncated to 500 chars)
+- `breadcrumb` - URL breadcrumb
+- `serp_features` - SERP features present (comma-separated)
+- `highlighted_terms` - Highlighted keywords (comma-separated)
+- `is_top_3` - Yes/No (top 3 ranking flag)
+- `is_top_10` - Yes/No (top 10 ranking flag)
+
+**SERP Feature Types**:
+- `featured_snippet` - Featured snippet box
+- `local_pack` - Google Local 3-pack
+- `people_also_ask` - People Also Ask boxes
+- `related_searches` - Related searches
+- `knowledge_graph` - Knowledge panel
+- `image_pack` - Image results
+- `video_carousel` - Video results
+
+### 5. Export to Google Sheets
+**Node**: `Append or update row in sheet`
+
+Automatically append new data to Google Sheets for analysis and reporting.
+
+**Sheet Structure**:
+| timestamp | keyword | position | domain | url | title | is_top_3 | is_top_10 |
+|-----------|---------|----------|--------|-----|-------|----------|-----------|
+| 2025-01-15 08:00 | best gelato | 3 | example.com | https://... | Best Gelato... | Yes | Yes |
+
+---
+
+## Output Data Structure
+
+### SERP Results (Full Example)
+```json
+{
+  "timestamp": "2025-01-15T08:00:00.000Z",
+  "task_id": "12345",
+  "keyword": "best gelato",
+  "search_engine": "google",
+  "device": "desktop",
+  "location_id": 26786,
+  "language_code": "nl",
+  "position": 1,
+  "type": "organic",
+  "rank_absolute": 3,
+  "domain": "example.com",
+  "url": "https://example.com/best-gelato-amsterdam",
+  "visible_url": "example.com › best-gelato-amsterdam",
+  "title": "Best Gelato in Amsterdam - Authentic Italian Ice Cream",
+  "description": "Discover the best gelato in Amsterdam at our authentic Italian gelateria. Fresh ingredients, traditional recipes, and over 30 flavors daily.",
+  "breadcrumb": "Home › Amsterdam › Best Gelato",
+  "serp_features": "featured_snippet, local_pack",
+  "highlighted_terms": "best, gelato, Amsterdam",
+  "is_top_3": "Yes",
+  "is_top_10": "Yes"
+}
+```
+
+---
+
+## Advanced Configurations
+
+### Multi-Keyword Tracking
+
+#### Track Multiple Keywords
+```javascript
+// In "Add SERP tasks" node:
+{
+  "keywords": `best gelato
+ice cream shop
+italian gelato
+gelato near me
+best dessert amsterdam
+artisan ice cream`
+}
+```
+
+#### Track Competitor Keywords
+```javascript
+{
+  "keywords": `best gelato amsterdam
+[competitor name] gelato
+gelato delivery amsterdam
+organic gelato shop
+vegan gelato amsterdam`
+}
+```
+
+### Multi-Location Tracking
+
+Create multiple "Add SERP tasks" nodes for different locations:
+
+```javascript
+// Location 1: Amsterdam
+{
+  "locationId": 26786,
+  "keywords": "best gelato"
+}
+
+// Location 2: Rotterdam
+{
+  "locationId": 26845,
+  "keywords": "best gelato"
+}
+
+// Location 3: Utrecht
+{
+  "locationId": 26912,
+  "keywords": "best gelato"
+}
+```
+
+### Device-Specific Tracking
+
+**Desktop Rankings**:
+```javascript
+{
+  "device": "desktop",
+  "keywords": "best gelato amsterdam"
+}
+```
+
+**Mobile Rankings** (often different for local searches):
+```javascript
+{
+  "device": "mobile",
+  "keywords": "gelato near me\nbest ice cream nearby"
+}
+```
+
+**Tablet Rankings**:
+```javascript
+{
+  "device": "tablet",
+  "keywords": "best gelato amsterdam"
+}
+```
+
+### Search Engine Comparison
+
+Track rankings across multiple search engines:
+
+```javascript
+// Google
+{ "searchEngine": "google", "keywords": "best gelato" }
+
+// Bing
+{ "searchEngine": "bing", "keywords": "best gelato" }
+
+// Yahoo
+{ "searchEngine": "yahoo", "keywords": "best gelato" }
+```
+
+---
+
+## Complete Workflow Example
+
+### Daily Local SEO Monitoring with Alerts
+
+```json
+{
+  "nodes": [
+    {
+      "name": "Schedule Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "days", "daysInterval": 1 }],
+          "hour": 8
+        }
+      }
+    },
+    {
+      "name": "Get SERP locations",
+      "type": "CUSTOM.seRanking",
+      "parameters": {
+        "resource": "serpClassic",
+        "operation": "getLocations",
+        "countryCode": "NL",
+        "q": "Amsterdam"
+      }
+    },
+    {
+      "name": "Add SERP tasks",
+      "type": "CUSTOM.seRanking",
+      "parameters": {
+        "resource": "serpClassic",
+        "operation": "addTasks",
+        "searchEngine": "google",
+        "device": "desktop",
+        "languageCode": "nl",
+        "locationId": "={{ $json.id }}",
+        "keywords": "best gelato amsterdam\ngelato shop\nitalian ice cream"
+      }
+    },
+    {
+      "name": "Wait for results",
+      "type": "n8n-nodes-base.wait",
+      "parameters": { "amount": 30, "unit": "seconds" }
+    },
+    {
+      "name": "Get SERP results",
+      "type": "CUSTOM.seRanking",
+      "parameters": {
+        "resource": "serpClassic",
+        "operation": "getResults",
+        "taskId": "={{ $json.task_id }}"
+      }
+    },
+    {
+      "name": "Process data",
+      "type": "n8n-nodes-base.code",
+      "parameters": { "jsCode": "/* Processing code */" }
+    },
+    {
+      "name": "Save to Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": "YOUR_SHEET_ID",
+        "sheetName": "SERP Tracking"
+      }
+    },
+    {
+      "name": "Check for ranking drops",
+      "type": "n8n-nodes-base.if",
+      "parameters": {
+        "conditions": {
+          "number": [
+            {
+              "value1": "={{ $json.position }}",
+              "operation": "larger",
+              "value2": 10
+            }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Send Slack alert",
+      "type": "n8n-nodes-base.slack",
+      "parameters": {
+        "channel": "#seo-alerts",
+        "text": "=⚠️ Ranking Alert\nKeyword: {{ $json.keyword }}\nPosition: {{ $json.position }}\nPreviously: Top 10"
+      }
+    }
+  ]
+}
+```
+
+---
+
+## Troubleshooting
+
+### Issue: "Location not found"
+**Solution**:
+- Verify country code is correct (NL, US, UK, etc.)
+- Use English location names when possible
+- Try broader locations (e.g., "Netherlands" instead of small town)
+- Check [supported locations](https://seranking.com/api/data/serp/) in API docs
+
+### Issue: "Task still processing after 5 minutes"
+**Solution**:
+- Increase wait time to 60 seconds for large keyword lists
+- Check if keywords contain special characters (remove them)
+- Reduce number of keywords per task (try 10-50 instead of 1,000)
+- Verify search engine is available for selected location
+
+### Issue: "No results returned"
+**Solution**:
+- Ensure keyword has search volume in selected location
+- Check if language code matches location (e.g., "nl" for Netherlands)
+- Try common/popular keywords first to verify setup
+- Some locations may have limited SERP data availability
+
+### Issue: "Invalid location_id"
+**Solution**:
+```javascript
+// Make sure locationId is a number, not string:
+"locationId": 26786          // Correct ✅
+"locationId": "26786"        // Incorrect ❌
+
+// Or use expression to convert:
+"locationId": "={{ Number($json.id) }}"
+```
+
+### Issue: "Google Sheets errors"
+**Solution**:
+- Verify Google Sheets credentials are connected
+- Ensure spreadsheet permissions allow editing
+- Check if sheet name exists (case-sensitive)
+- Clear any filters on the target sheet
+
+---
+
+## Best Practices
+
+### DO ✅
+- **Track consistently**: Run at same time daily for accurate trend data
+- **Start small**: Test with 5-10 keywords before scaling to hundreds
+- **Use location tags**: Add descriptive tags to organize tasks
+- **Monitor mobile separately**: Mobile and desktop rankings often differ
+- **Archive old data**: Move data older than 90 days to separate sheets
+- **Track competitors**: Include competitor domains to benchmark performance
+- **Document changes**: Note when SEO changes were made in a separate column
+
+### DON'T ❌
+- **Over-track**: Running every hour wastes credits and provides little value
+- **Ignore language codes**: Wrong language returns irrelevant results
+- **Mix devices**: Track desktop and mobile in separate tasks
+- **Skip validation**: Always verify location IDs before bulk operations
+- **Forget timestamps**: Essential for historical trend analysis
+- **Ignore SERP features**: Feature presence impacts click-through rates
+
+---
+
+## Performance & Costs
+
+### Task Processing Times
+- **Small tasks** (1-10 keywords): 10-30 seconds
+- **Medium tasks** (50-100 keywords): 1-3 minutes
+- **Large tasks** (500-1,000 keywords): 3-10 minutes
+
+### Credit Usage
+**Standard SERP Task**: 1 credit per keyword
+- 10 keywords = 10 credits
+- 100 keywords = 100 credits
+- 1,000 keywords = 1,000 credits
+
+**Advanced Results**: 2 credits per keyword (includes full SERP features data)
+
+### Recommended Tracking Frequency
+- **High-priority keywords**: Daily
+- **Medium-priority keywords**: Weekly
+- **Long-tail keywords**: Bi-weekly or monthly
+- **Competitor tracking**: Weekly
+- **Seasonal keywords**: Daily during peak season
+
+---
+
+## Example Use Case: Local Business Tracking
+
+### Scenario
+A gelato shop in Amsterdam wants to track rankings in nearby towns to plan expansion.
+
+**Keywords Tracked**:
+- "best gelato [city name]"
+- "ice cream shop [city name]"
+- "italian gelato near [city name]"
+
+**Locations** (Amsterdam area):
+- Amsterdam (location_id: 26786)
+- Haarlem (location_id: 26801)
+- Zaandam (location_id: 26823)
+- Amstelveen (location_id: 26745)
+- Hilversum (location_id: 26834)
+
+**Results Achieved**:
+```
+📊 SERP TRACKING SUMMARY
+Date Range: Jan 1-15, 2025
+
+🎯 Amsterdam
+- "best gelato" - Position 3 ⬆️ (was 5)
+- "ice cream shop" - Position 7 ➡️ (stable)
+- "italian gelato" - Position 2 ⬆️ (was 4)
+
+🎯 Haarlem
+- "best gelato" - Position 12 ⬇️ (was 9)
+- "ice cream shop" - Position 15 ➡️
+- "italian gelato" - Not in top 20
+
+🎯 Hilversum
+- "best gelato" - Position 8 ⬆️ (was 11)
+- "ice cream shop" - Position 5 ⬆️ (was 9)
+- "italian gelato" - Position 6 🆕 (new)
+
+💡 INSIGHTS:
+- Amsterdam: Strong performance, maintain current strategy
+- Haarlem: Need more backlinks from local sites
+- Hilversum: Growing visibility, consider paid ads
+```
+
+---
+
+## Workflow Enhancements
+
+### 1. Historical Comparison
+Add a "Get Previous Data" node to compare current vs. previous rankings:
+```javascript
+const previousPosition = /* fetch from database */;
+const currentPosition = $json.position;
+const change = previousPosition - currentPosition;
+
+return {
+  ...json,
+  previous_position: previousPosition,
+  change: change,
+  trend: change > 0 ? "⬆️" : change < 0 ? "⬇️" : "➡️"
+};
+```
+
+### 2. Competitor Alerting
+```javascript
+// Alert when competitor appears in top 3
+if ($json.position <= 3 && $json.domain.includes('competitor')) {
+  // Send alert
+}
+```
+
+### 3. SERP Feature Tracking
+```javascript
+// Track featured snippet opportunities
+const hasSnippet = $json.serp_features.includes('featured_snippet');
+const inTop10 = $json.position <= 10;
+
+if (!hasSnippet && inTop10) {
+  // Alert: Opportunity to optimize for featured snippet
+}
+```
+
+### 4. Google Data Studio Integration
+Export data to BigQuery for advanced visualization in Google Data Studio.
+
+### 5. Automated Reports
+Schedule weekly email reports with:
+- Top movers (biggest ranking changes)
+- New top 10 appearances
+- Lost rankings (dropped out of top 10)
+- SERP feature wins
+
+---
+
+## Resources
+
+- [SE Ranking SERP API Documentation](https://seranking.com/api/data/serp/)
+- [Supported Search Engines & Locations](https://seranking.com/api/data/serp/)
+- [n8n Community Forum](https://community.n8n.io/)
+- [Report Issues](https://github.com/seranking/n8n-nodes-seranking/issues)
+
+---
+
+## Support
+
+Need help?
+- Check the [main README](../../README.md) for general troubleshooting
+- Review API documentation at [seranking.com/api](https://seranking.com/api.html)
+- Contact SE Ranking support for API-specific questions
+- Join the n8n community for workflow optimization tips
+
+---
+
+## Notes
+
+**🎯 Pro Tips**:
+- Save frequently-used location IDs as constants in n8n
+- Create separate workflows for different business locations
+- Use tags to organize tasks by campaign, client, or project
+- Set up Slack/email alerts for ranking changes > 5 positions
+- Export data weekly to avoid Google Sheets row limits
+
+**⚠️ Important**:
+- SERP data refreshes daily, more frequent tracking uses more credits
+- Some search engines have limited location availability
+- Mobile rankings can differ significantly from desktop
+- Local pack results require location-specific searches
+- Language code must match location for accurate results
+
+---
+
+**Built for location-based SEO tracking with n8n + SE Ranking** 🚀

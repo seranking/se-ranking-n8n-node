@@ -6,7 +6,7 @@ export async function apiRequest(
     endpoint: string,
     body: any = {},
     query: any = {},
-    itemIndex: number = 0
+    itemIndex = 0
 ): Promise<any> {
     const credentials = await this.getCredentials('seRankingApi');
     

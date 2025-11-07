@@ -1,0 +1,483 @@
+{
+  "name": "Gelato-Small-Towns-Amsterdam-Area",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -736,
+        -112
+      ],
+      "id": "b3ef2f6a-4d77-44ad-bbd5-1c9bea3d7869",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "resource": "serpClassic",
+        "operation": "getResults",
+        "taskId": "={{ $('Add SERP tasks').item.json.task_id }}"
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        -112
+      ],
+      "id": "13932601-d237-4a4b-babf-9456de4d05af",
+      "name": "Get SERP results",
+      "credentials": {
+        "seRankingApi": {
+          "id": "nDtRSLkHuDYAvML2",
+          "name": "SE Ranking account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "serpClassic",
+        "operation": "getLocations",
+        "countryCode": "NL",
+        "q": "Edam"
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        -528,
+        -112
+      ],
+      "id": "6a76c2da-0d44-460b-b28f-88a5ed1cf820",
+      "name": "Get SERP locations",
+      "credentials": {
+        "seRankingApi": {
+          "id": "nDtRSLkHuDYAvML2",
+          "name": "SE Ranking account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "serpClassic",
+        "languageCode": "nl",
+        "locationId": 26786,
+        "keywords": "best gelato"
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        -112
+      ],
+      "id": "b3e7bf5c-f174-423a-b6f6-a680e7375814",
+      "name": "Add SERP tasks",
+      "credentials": {
+        "seRankingApi": {
+          "id": "nDtRSLkHuDYAvML2",
+          "name": "SE Ranking account 7"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "2e57ac74-a62b-46eb-9316-43511f67c53f",
+              "leftValue": "Processing",
+              "rightValue": "={{ $json.status }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        80,
+        -112
+      ],
+      "id": "6bc64545-7e94-44a7-99e4-037e4644f4d5",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        304,
+        -320
+      ],
+      "id": "6ec44425-e06c-47ef-b78b-5745ce92752c",
+      "name": "Wait1",
+      "webhookId": "566390ca-e8a5-4dce-980c-7e5714e177f7"
+    },
+    {
+      "parameters": {
+        "jsCode": "const inputData = $input.all();\nconst outputRows = [];\n\nfunction getHighlightedTerms(terms) {\n  if (!Array.isArray(terms) || terms.length === 0) return '';\n  return terms.join(', ');\n}\n\nfunction getSerpFeatures(features) {\n  if (!Array.isArray(features) || features.length === 0) return '';\n  return features.join(', ');\n}\n\nfunction truncate(text, maxLength = 500) {\n  if (!text) return '';\n  if (text.length <= maxLength) return text;\n  return text.substring(0, maxLength) + '...';\n}\n\nfunction extractDomain(url) {\n  if (!url) return '';\n  try {\n    const urlObj = new URL(url);\n    return urlObj.hostname.replace('www.', '');\n  } catch {\n    return '';\n  }\n}\n\nfunction getCurrentTimestamp() {\n  return new Date().toISOString();\n}\n\ninputData.forEach((item, itemIndex) => {\n  const json = item.json;\n  \n  const requestMetadata = json.request_metadata || {};\n  const keyword = requestMetadata.keyword || json.keyword || 'N/A';\n  const searchEngine = requestMetadata.search_engine || json.search_engine || 'google';\n  const device = requestMetadata.device || json.device || 'desktop';\n  const locationId = requestMetadata.location_id || json.location_id || '';\n  const languageCode = requestMetadata.language_code || json.language_code || '';\n  const taskId = requestMetadata.task_id || json.task_id || itemIndex.toString();\n  \n  let results = [];\n  \n  if (json.results && Array.isArray(json.results)) {\n    results = json.results;\n  } else if (json.items && Array.isArray(json.items)) {\n    results = json.items;\n  } else if (Array.isArray(json)) {\n    results = json;\n  }\n  \n  if (results.length === 0) {\n    outputRows.push({\n      timestamp: getCurrentTimestamp(),\n      task_id: taskId,\n      keyword: keyword,\n      search_engine: searchEngine,\n      device: device,\n      location_id: locationId,\n      language_code: languageCode,\n      status: 'No results found',\n      position: '',\n      type: '',\n      domain: '',\n      url: '',\n      title: '',\n      description: '',\n      breadcrumb: '',\n      serp_features: '',\n      highlighted_terms: ''\n    });\n    return;\n  }\n  \n  results.forEach((result, resultIndex) => {\n    const type = result.type || 'organic';\n    const position = result.position || resultIndex + 1;\n    const rankAbsolute = result.rank_absolute || position;\n    \n    const url = result.url || result.link || '';\n    const domain = result.domain || extractDomain(url);\n    const visibleUrl = result.visible_url || result.display_url || domain;\n    \n    const title = truncate(result.title || '', 200);\n    const description = truncate(result.description || result.snippet || '', 500);\n    const breadcrumb = result.breadcrumb || '';\n    \n    const serpFeatures = getSerpFeatures(result.serp_features || result.features);\n    const highlightedTerms = getHighlightedTerms(result.highlighted_terms || result.highlights);\n    \n    outputRows.push({\n      timestamp: getCurrentTimestamp(),\n      task_id: taskId,\n      keyword: keyword,\n      search_engine: searchEngine,\n      device: device,\n      location_id: locationId,\n      language_code: languageCode,\n      position: position,\n      type: type,\n      rank_absolute: rankAbsolute,\n      domain: domain,\n      url: url,\n      visible_url: visibleUrl,\n      title: title,\n      description: description,\n      breadcrumb: breadcrumb,\n      serp_features: serpFeatures,\n      highlighted_terms: highlightedTerms,\n      is_top_3: position <= 3 ? 'Yes' : 'No',\n      is_top_10: position <= 10 ? 'Yes' : 'No'\n    });\n  });\n});\n\nreturn outputRows.map(row => ({ json: row }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        288,
+        -16
+      ],
+      "id": "d28695ec-476c-491c-938f-cd257f039f48",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1f28c44x48mSvpQHdWAf4_fWzmTQLDjU7QeDj0kM8oJA",
+          "mode": "list",
+          "cachedResultName": "Gelato Small Towns Amsterdam Area",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f28c44x48mSvpQHdWAf4_fWzmTQLDjU7QeDj0kM8oJA/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1f28c44x48mSvpQHdWAf4_fWzmTQLDjU7QeDj0kM8oJA/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "timestamp",
+              "displayName": "timestamp",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "task_id",
+              "displayName": "task_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "search_engine",
+              "displayName": "search_engine",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "device",
+              "displayName": "device",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "location_id",
+              "displayName": "location_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "language_code",
+              "displayName": "language_code",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "position",
+              "displayName": "position",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "type",
+              "displayName": "type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "rank_absolute",
+              "displayName": "rank_absolute",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "domain",
+              "displayName": "domain",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "url",
+              "displayName": "url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "visible_url",
+              "displayName": "visible_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "title",
+              "displayName": "title",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "description",
+              "displayName": "description",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "breadcrumb",
+              "displayName": "breadcrumb",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "serp_features",
+              "displayName": "serp_features",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "highlighted_terms",
+              "displayName": "highlighted_terms",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_top_3",
+              "displayName": "is_top_3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "is_top_10",
+              "displayName": "is_top_10",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        496,
+        -16
+      ],
+      "id": "4abb4ee3-8729-4fea-8d13-80edfc2ed49e",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "K2iUXQtuUAF8v9IT",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Get SERP locations",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get SERP locations": {
+      "main": [
+        [
+          {
+            "node": "Add SERP tasks",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Add SERP tasks": {
+      "main": [
+        [
+          {
+            "node": "Get SERP results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get SERP results": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Get SERP results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "7be56b6f-08ba-4e3d-b8ce-e02fb8a87455",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1183d366d4439b0dc8255366e7a99e14405a4b582a61d278891dceb1aebf30da"
+  },
+  "id": "WM36CUZzbhssMHF0",
+  "tags": []
+}

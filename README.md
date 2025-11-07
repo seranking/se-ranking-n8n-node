@@ -58,7 +58,7 @@ npm install n8n -g
 **Option A: From .tgz file**
 
 ```bash
-npm install -g n8n-nodes-seranking-1.2.0.tgz
+npm install -g seranking-n8n-nodes-seranking-1.3.0.tgz
 ```
 
 **Option B: From GitHub**
@@ -174,7 +174,7 @@ The node will automatically test your credentials by making a test request to th
 
 ## Operations
 
-This node provides access to 5 SE Ranking resources with 54 total operations:
+This node provides access to 6 SE Ranking resources with 59 total operations:
 
 ### AI Search (4 operations)
 
@@ -247,6 +247,13 @@ This node provides access to 5 SE Ranking resources with 54 total operations:
 - Recheck Standard Audit - Re-run HTML audit
 - Recheck Advanced Audit - Re-run JS audit
 
+### SERP Classic (5 operations)
+
+- Add Tasks - Create SERP tasks for keywords (up to 1,000 per request)
+- Get Results - Get standard SERP results for a task
+- List Tasks - List recent SERP tasks (last 24 hours)
+- Get Advanced Results - Retrieve detailed SERP results with all features
+- Get Locations - Get available location IDs for SERP queries
 
 ## Usage Examples
 
@@ -256,30 +263,22 @@ Ready-to-use workflows demonstrating real-world applications of the SE Ranking n
 
 ### 🤖 Example 1: AI Search Visibility Tracker
 
-**Track your brand's presence across ChatGPT, Perplexity, and Gemini**
+**Track your brand's presence and competitive gaps across ChatGPT, Perplexity, and Gemini**
+
+Two comprehensive workflows for monitoring AI visibility and identifying content opportunities.
+
+**Workflow 1: AI Search Visibility Tracker**
 
 Monitor how often your brand appears in AI-powered search engines with automated historical tracking.
-
-**What You'll Get:**
 
 - Link presence count across multiple AI engines
 - Average position tracking in AI citations
 - AI opportunity traffic estimates
 - Period-over-period comparison metrics
 
-**Best For:** Marketing teams tracking AI SEO performance, Brand managers monitoring AI visibility
+**Workflow 2: Competitor Topic Gap Analysis**
 
-📂 [View Full Guide & Download Workflow →](./Usage-Examples/AI-Search)
-
----
-
-### 🎯 Example 2: Competitor Topic Gap Analysis
-
-**Identify content opportunities by analyzing where competitors outrank you in AI search and traditional SEO**
-
-Comprehensive competitive analysis combining AI visibility gaps with traditional SEO keyword gaps.
-
-**What You'll Get:**
+Identify content opportunities by analyzing where competitors outrank you in AI search and traditional SEO.
 
 - AI visibility gaps across ChatGPT, Perplexity, and Gemini
 - Keyword gaps with search volume and difficulty
@@ -287,13 +286,13 @@ Comprehensive competitive analysis combining AI visibility gaps with traditional
 - Prioritized opportunities with HIGH/MEDIUM/LOW scoring
 - Actionable recommendations for each gap
 
-**Best For:** Content strategists planning editorial calendars, SEO teams doing competitive intelligence
+**Best For:** Marketing teams tracking AI SEO performance, Content strategists planning editorial calendars, SEO teams doing competitive intelligence
 
 📂 [View Full Guide & Download Workflow →](./Usage-Examples/AI-Search)
 
 ---
 
-### 🔗 Example 3: Backlinks Monitoring & Analysis
+### 🔗 Example 2: Backlinks Monitoring & Analysis
 
 **Track new/lost backlinks, monitor domain authority, and analyze anchor text distribution**
 
@@ -309,11 +308,11 @@ Automatically monitor backlink portfolio health with daily tracking and alerts f
 
 **Best For:** SEO agencies managing client backlink portfolios, In-house SEO teams tracking link-building campaigns
 
-📂 [View Full Guide & Download Workflow →](./Usage-Examples/Backlinks)
+📂 [View Full Guide & Download Workflow →](./Usage-Examples/SERP-Classic)
 
 ---
 
-### 📊 Example 4: Domain Analysis Data Processor
+### 📊 Example 3: Domain Analysis Data Processor
 
 **Transform SE Ranking API data into structured Google Sheets reports**
 
@@ -333,7 +332,7 @@ Automatically process and organize domain analysis data with intelligent type de
 
 ---
 
-### 🔍 Example 5: Keyword Research Automation
+### 🔍 Example 4: Keyword Research Automation
 
 **Automate comprehensive keyword research with trend analysis**
 
@@ -352,7 +351,7 @@ Build an automated keyword intelligence pipeline with historical tracking and SE
 
 ---
 
-### 🔧 Example 6: Website Audit Automation
+### 🔧 Example 5: Website Audit Automation
 
 **Automatically crawl sites, detect issues, and generate reports**
 
@@ -368,6 +367,26 @@ Schedule regular technical SEO audits and get alerts when critical issues are de
 **Best For:** Development teams doing pre-launch checks, SEO consultants managing multiple client sites
 
 📂 [View Full Guide & Download Workflow →](./Usage-Examples/Website-Audit)
+
+---
+
+### 📍 Example 6: SERP Classic Tracking
+
+**Track keyword rankings and analyze SERP features across search engines**
+
+Monitor keyword positions, SERP features, and competitor visibility with automated rank tracking.
+
+**What You'll Get:**
+
+- Keyword position tracking across multiple locations
+- SERP features analysis (featured snippets, local pack, etc.)
+- Competitor ranking visibility
+- Device-specific rankings (desktop, mobile, tablet)
+- Historical rank tracking
+
+**Best For:** SEO teams tracking keyword performance, Local businesses monitoring location-based rankings, Agencies managing multi-client SERP tracking
+
+📂 [View Full Guide & Download Workflow →](./Usage-Examples/SERP-Classic)
 
 ---
 
@@ -392,6 +411,7 @@ This node implements the following SE Ranking APIs:
 - [Domain Analysis API](https://seranking.com/api/data/domain-analysis/)
 - [Keyword Research API](https://seranking.com/api/data/keyword-research/)
 - [Website Audit API](https://seranking.com/api/data/website-audit/)
+- [SERP API](https://seranking.com/api/data/serp/)
 
 For detailed API specifications, visit [SE Ranking API Documentation](https://seranking.com/api.html).
 
@@ -399,7 +419,27 @@ For detailed API specifications, visit [SE Ranking API Documentation](https://se
 
 ## Version History
 
-### v1.2.3 (Current)
+### v1.3.0 (Current)
+
+- ✅ Complete AI Search resource (4 operations)
+- ✅ Complete Backlinks resource (25 operations)
+- ✅ Enhanced Domain Analysis resource (8 operations - added History, Comparison, Paid Ads)
+- ✅ Complete Keyword Research resource (5 operations)
+- ✅ Complete Website Audit resource (14 operations)
+- ✅ **NEW: Complete SERP Classic resource (5 operations)**
+- ✅ **Total: 59 operations across 6 resources**
+- ✅ Comprehensive error handling with detailed messages
+- ✅ Full TypeScript support
+- ✅ Input validation (domains, sources, dates)
+- ✅ Pagination support (offset/limit)
+- ✅ Advanced filtering options
+- ✅ Multi-keyword support (up to 1,000 keywords for SERP tasks)
+- ✅ Backlink export and bulk operations
+- ✅ Website audit creation and management
+- ✅ **NEW: SERP rank tracking and analysis**
+- ✅ **NEW: Multi-location SERP data retrieval**
+
+### v1.2.3
 
 - ✅ Complete AI Search resource (4 operations)
 - ✅ **NEW: Complete Backlinks resource (25 operations)**
@@ -433,7 +473,7 @@ For detailed API specifications, visit [SE Ranking API Documentation](https://se
 
 ## Features
 
-✅ **54 Operations** - Comprehensive coverage across 5 major resources  
+✅ **59 Operations** - Comprehensive coverage across 6 major resources  
 ✅ **Type Safety** - Full TypeScript implementation with strict typing  
 ✅ **Error Handling** - Detailed error messages with troubleshooting hints  
 ✅ **Pagination** - Efficient handling of large datasets  
@@ -444,6 +484,7 @@ For detailed API specifications, visit [SE Ranking API Documentation](https://se
 ✅ **Batch Operations** - Support for multiple keywords/domains  
 ✅ **Backlink Monitoring** - Complete backlink analysis and tracking  
 ✅ **Website Auditing** - Technical SEO audits with issue detection
+✅ **SERP Tracking** - Keyword ranking and SERP features analysis
 
 ---
 
@@ -711,13 +752,15 @@ n8n-nodes-seranking/
 │       │   │   ├── BacklinksOperations.ts                        # Backlinks operations logic
 │       │   │   ├── DomainAnalysisOperations.ts                   # Domain Analysis operations logic
 │       │   │   ├── KeywordResearchOperations.ts                  # Keyword Research operations logic
-│       │   │   └── WebsiteAuditOperations.ts                     # Website Audit operations logic
+│       │   │   ├── WebsiteAuditOperations.ts                     # Website Audit operations logic
+│       │   │   └── SerpClassicOperations.ts                      # SERP Classic operations logic
 │       │   └── descriptions/
 │       │       ├── AiSearchDescription.ts                        # AI Search UI definitions
 │       │       ├── BacklinksDescription.ts                       # Backlinks UI definitions
 │       │       ├── DomainAnalysisDescription.ts                  # Domain Analysis UI definitions
 │       │       ├── KeywordResearchDescription.ts                 # Keyword Research UI definitions
-│       │       └── WebsiteAuditDescription.ts                    # Website Audit UI definitions
+│       │       ├── WebsiteAuditDescription.ts                    # Website Audit UI definitions
+│       │       └── SerpClassicDescription.ts                     # SERP Classic UI definitions
 │       └── utils/
 │           ├── validators.ts                                     # Input validators
 │           └── apiRequest.ts                                     # API request handler
@@ -765,9 +808,14 @@ n8n-nodes-seranking/
 │   │   ├── Get_Longtail_Keywords.jpg                             # Screenshot: Longtail Keywords
 │   │   └── README.md                                             # Keyword Research workflow documentation
 │   │
-│   └── Website-Audit/
-│       ├── Website-Audit-Technical-SEO-Monitor.json              # Website audit workflow
-│       └── README.md                                             # Website Audit workflow documentation
+│   ├── Website-Audit/
+│   │   ├── Website-Audit-Technical-SEO-Monitor.json              # Website audit workflow
+│   │   └── README.md                                             # Website Audit workflow documentation
+│   │
+│   └── SERP-Classic/
+│       ├── Gelato-Small-Towns-Amsterdam-Area.json                # SERP tracking workflow
+│       ├── Gelato Small Towns Amsterdam Area.xlsx                # Workflow results
+│       └── README.md                                             # SERP Classic workflow documentation
 │
 ├── package.json
 ├── package-lock.json

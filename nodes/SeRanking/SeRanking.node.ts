@@ -12,6 +12,7 @@ import { domainAnalysisOperations, domainAnalysisFields } from './dataApi/descri
 import { keywordResearchOperations, keywordResearchFields } from './dataApi/descriptions/KeywordResearchDescription';
 import { backlinksOperations, backlinksFields } from './dataApi/descriptions/BacklinksDescription';
 import { websiteAuditOperations, websiteAuditFields } from './dataApi/descriptions/WebsiteAuditDescription';
+import { serpClassicOperations, serpClassicFields } from './dataApi/descriptions/SerpClassicDescription'; 
 
 
 // Import Data API operations
@@ -20,6 +21,7 @@ import { DomainAnalysisOperations } from './dataApi/operations/DomainAnalysisOpe
 import { KeywordResearchOperations } from './dataApi/operations/KeywordResearchOperations';
 import { BacklinksOperations } from './dataApi/operations/BacklinksOperations';
 import { WebsiteAuditOperations } from './dataApi/operations/WebsiteAuditOperations';
+import { SerpClassicOperations } from './dataApi/operations/SerpClassicOperations';
 
 
 
@@ -72,6 +74,11 @@ export class SeRanking implements INodeType {
 						description: 'Keyword metrics, volume, CPC, and related keywords',
 					},
 					{
+						name: 'SERP Classic',                       
+						value: 'serpClassic',                       
+						description: 'SERP tracking and results retrieval', 
+					},
+					{
 						name: 'Website Audit',
 						value: 'websiteAudit',
 						description: 'Site crawling, technical SEO, and on-page analysis',
@@ -91,6 +98,9 @@ export class SeRanking implements INodeType {
 			// Keyword Research
 			...keywordResearchOperations,
 			...keywordResearchFields,
+			// SERP Classic                                      
+			...serpClassicOperations,                           
+			...serpClassicFields,                               
 			// Website Audit
 			...websiteAuditOperations,
 			...websiteAuditFields,
@@ -117,6 +127,9 @@ export class SeRanking implements INodeType {
 						break;
 					case 'keywordResearch':
 						responseData = await KeywordResearchOperations.call(this, i);
+						break;
+					case 'serpClassic':                                        
+						responseData = await SerpClassicOperations.call(this, i); 
 						break;
 					case 'websiteAudit':
 						responseData = await WebsiteAuditOperations.call(this, i);

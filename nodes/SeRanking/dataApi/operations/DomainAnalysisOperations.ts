@@ -10,7 +10,7 @@ export async function DomainAnalysisOperations(
 	
 	let endpoint = '';
 	const params: any = {};
-	let method = 'GET';
+	const method = 'GET';
 
 	switch (operation) {
 		case 'getOverviewDb': {

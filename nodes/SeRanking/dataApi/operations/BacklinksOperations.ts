@@ -21,7 +21,7 @@ export async function BacklinksOperations(
 	
 	let endpoint = '';
 	const params: any = {};
-	let method = 'GET';
+	const method = 'GET';
 
 	switch (operation) {
 		case 'getSummary': {

@@ -1,0 +1,466 @@
+{
+  "name": "Keyword Research for Content Generation",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        288
+      ],
+      "id": "5b5327a9-6c03-4687-8acd-5b4d3d966b89",
+      "name": "When clicking 'Execute workflow'"
+    },
+    {
+      "parameters": {
+        "resource": "keywordResearch",
+        "operation": "getLongtail",
+        "keyword": "content marketing",
+        "additionalFields": {
+          "limit": 50
+        }
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        176,
+        48
+      ],
+      "id": "7c7a0288-e6f8-4e73-b182-9f81318e38a5",
+      "name": "Get longtail keywords",
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "keywordResearch",
+        "operation": "getQuestions",
+        "keyword": "content marketing",
+        "additionalFields": {
+          "limit": 50,
+          "historyTrend": true,
+          "volumeFrom": 500,
+          "difficultyTo": 50
+        }
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        176,
+        208
+      ],
+      "id": "5e66c67d-155b-45ee-86fe-7ffadd6242a8",
+      "name": "Get question keywords",
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "keywordResearch",
+        "operation": "getSimilar",
+        "keyword": "content marketing",
+        "additionalFields": {
+          "limit": 50,
+          "historyTrend": true,
+          "volumeFrom": 500,
+          "difficultyTo": 50
+        }
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        176,
+        368
+      ],
+      "id": "abe2caba-d9c9-43f3-b1df-b3b475acd27f",
+      "name": "Get similar keywords",
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "keywordResearch",
+        "operation": "getRelated",
+        "keyword": "content marketing",
+        "additionalFields": {
+          "limit": 50,
+          "historyTrend": true,
+          "volumeFrom": 500,
+          "difficultyTo": 50
+        }
+      },
+      "type": "CUSTOM.seRanking",
+      "typeVersion": 1,
+      "position": [
+        176,
+        528
+      ],
+      "id": "eb692e44-d088-4624-800b-c419e21d09cc",
+      "name": "Get related keywords",
+      "credentials": {
+        "seRankingApi": {
+          "id": "wmJxGu1vHuZJIXCR",
+          "name": "SE Ranking account 4"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3,
+      "position": [
+        496,
+        288
+      ],
+      "id": "b0b97f3c-6cff-4da9-8a3e-48a17486ff5a",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Content Generation Keyword Analyzer\nconst allInput = $input.all();\nconst timestamp = new Date().toISOString().split('T')[0];\nlet allKeywords = [];\nconst seenKeywords = new Set();\n\n// Extract and deduplicate keywords from all sources\nallInput.forEach((item, sectionIndex) => {\n  const section = item.json;\n  \n  if (!section || !section.keywords || !Array.isArray(section.keywords)) {\n    return;\n  }\n  \n  section.keywords.forEach(kw => {\n    // Handle both string and object keyword formats\n    const keywordText = typeof kw === 'string' ? kw : kw.keyword;\n    const keywordLower = keywordText.toLowerCase().trim();\n    \n    // Skip duplicates\n    if (seenKeywords.has(keywordLower)) {\n      return;\n    }\n    seenKeywords.add(keywordLower);\n    \n    // For object keywords with full metrics\n    if (typeof kw === 'object' && kw.keyword) {\n      // Calculate opportunity score (0-100)\n      const volumeScore = Math.min((kw.volume || 0) / 10000, 1) * 40;\n      const difficultyScore = (100 - (kw.difficulty || 0)) / 100 * 40;\n      const cpcScore = Math.min((kw.cpc || 0) / 20, 1) * 20;\n      const opportunityScore = Math.round(volumeScore + difficultyScore + cpcScore);\n      \n      // Determine search intent\n      let intent = 'informational';\n      const kwText = keywordText.toLowerCase();\n      \n      if (kwText.match(/\\b(buy|purchase|price|cost|cheap|deal|discount|order)\\b/)) {\n        intent = 'transactional';\n      } else if (kwText.match(/\\b(best|top|review|vs|versus|compare|alternative)\\b/)) {\n        intent = 'commercial';\n      } else if (kwText.match(/\\b(how|what|why|when|where|guide|tutorial|tips|learn)\\b/)) {\n        intent = 'informational';\n      } else if (kwText.match(/\\b(login|sign up|download|free trial|official)\\b/)) {\n        intent = 'navigational';\n      }\n      \n      // Suggest content type\n      let contentType = 'blog post';\n      \n      if (kwText.startsWith('how to') || kwText.includes('step by step')) {\n        contentType = 'how-to guide';\n      } else if (kwText.startsWith('what is') || kwText.startsWith('why is')) {\n        contentType = 'explainer article';\n      } else if (kwText.match(/\\?$/)) {\n        contentType = 'FAQ / Q&A';\n      } else if (kwText.match(/\\b(best|top [0-9]|top ten)\\b/)) {\n        contentType = 'listicle';\n      } else if (kwText.match(/\\b(vs|versus|compare|comparison)\\b/)) {\n        contentType = 'comparison article';\n      } else if (kwText.includes('guide') || kwText.includes('complete')) {\n        contentType = 'comprehensive guide';\n      } else if (kwText.match(/\\b(review|reviews)\\b/)) {\n        contentType = 'review article';\n      } else if (kwText.match(/\\b(tips|strategies|tactics|ideas)\\b/)) {\n        contentType = 'tips & tactics';\n      }\n      \n      // Analyze trend\n      let trendStatus = 'stable';\n      let trendAvg = 0;\n      let trendDirection = 0;\n      \n      if (kw.history_trend && typeof kw.history_trend === 'object') {\n        const trendValues = Object.values(kw.history_trend);\n        if (trendValues.length >= 6) {\n          const recent3 = trendValues.slice(-3).reduce((a, b) => a + b, 0) / 3;\n          const older3 = trendValues.slice(0, 3).reduce((a, b) => a + b, 0) / 3;\n          trendAvg = Math.round(trendValues.reduce((a, b) => a + b, 0) / trendValues.length);\n          \n          if (recent3 > older3 * 1.3) {\n            trendStatus = 'trending up';\n            trendDirection = Math.round(((recent3 - older3) / older3) * 100);\n          } else if (recent3 < older3 * 0.7) {\n            trendStatus = 'trending down';\n            trendDirection = Math.round(((recent3 - older3) / older3) * 100);\n          }\n        }\n      }\n      \n      // Calculate estimated monthly traffic (CTR assumptions)\n      let estimatedTraffic = 0;\n      if (kw.volume) {\n        // Assume 30% CTR for position 1, 15% for 2-3, 10% for 4-5, 5% for 6-10\n        // For content generation, estimate top 5 ranking potential\n        estimatedTraffic = Math.round(kw.volume * 0.15);\n      }\n      \n      // Priority classification\n      let priority = 'LOW';\n      if (opportunityScore >= 70) {\n        priority = 'HIGH';\n      } else if (opportunityScore >= 50) {\n        priority = 'MEDIUM';\n      }\n      \n      // Extract SERP features and intents if available\n      const serpFeatures = kw.serp_features ? \n        (Array.isArray(kw.serp_features) ? kw.serp_features.join('; ') : kw.serp_features) : '';\n      const intents = kw.intents ? \n        (Array.isArray(kw.intents) ? kw.intents.join('; ') : kw.intents) : intent;\n      \n      allKeywords.push({\n        date: timestamp,\n        keyword: keywordText,\n        volume: kw.volume || 0,\n        cpc: kw.cpc || 0,\n        difficulty: kw.difficulty || 0,\n        competition: kw.competition || 0,\n        relevance: kw.relevance || null,\n        opportunity_score: opportunityScore,\n        priority: priority,\n        search_intent: intents || intent,\n        content_type: contentType,\n        trend_status: trendStatus,\n        trend_direction_pct: trendDirection,\n        trend_avg_volume: trendAvg,\n        estimated_monthly_traffic: estimatedTraffic,\n        serp_features: serpFeatures,\n        section_source: sectionIndex === 0 ? 'longtail' : \n                       sectionIndex === 1 ? 'questions' : \n                       sectionIndex === 2 ? 'similar' : 'related'\n      });\n    }\n    // For simple string keywords\n    else {\n      allKeywords.push({\n        date: timestamp,\n        keyword: keywordText,\n        volume: 0,\n        cpc: 0,\n        difficulty: 0,\n        competition: 0,\n        relevance: null,\n        opportunity_score: 0,\n        priority: 'UNKNOWN',\n        search_intent: 'unknown',\n        content_type: 'blog post',\n        trend_status: 'unknown',\n        trend_direction_pct: 0,\n        trend_avg_volume: 0,\n        estimated_monthly_traffic: 0,\n        serp_features: '',\n        section_source: sectionIndex === 0 ? 'longtail' : \n                       sectionIndex === 1 ? 'questions' : \n                       sectionIndex === 2 ? 'similar' : 'related'\n      });\n    }\n  });\n});\n\n// Sort by opportunity score descending\nallKeywords.sort((a, b) => b.opportunity_score - a.opportunity_score);\n\nreturn allKeywords.map(kw => ({ json: kw }));"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        288
+      ],
+      "id": "3795b08b-6efa-448b-afe7-3eaf6c6cecf9",
+      "name": "Analyze & Score Keywords for Content"
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1U7bYqZZ2ed1xRqc6YCXo4CoXiKzek_gxaIGx-R3xZ4g",
+          "mode": "list",
+          "cachedResultName": "Keyword Research for Content",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1U7bYqZZ2ed1xRqc6YCXo4CoXiKzek_gxaIGx-R3xZ4g/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1U7bYqZZ2ed1xRqc6YCXo4CoXiKzek_gxaIGx-R3xZ4g/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "date",
+              "displayName": "date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "keyword",
+              "displayName": "keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "volume",
+              "displayName": "volume",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cpc",
+              "displayName": "cpc",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "difficulty",
+              "displayName": "difficulty",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "competition",
+              "displayName": "competition",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "relevance",
+              "displayName": "relevance",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "opportunity_score",
+              "displayName": "opportunity_score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "priority",
+              "displayName": "priority",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "search_intent",
+              "displayName": "search_intent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "content_type",
+              "displayName": "content_type",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "trend_status",
+              "displayName": "trend_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "trend_direction_pct",
+              "displayName": "trend_direction_pct",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "trend_avg_volume",
+              "displayName": "trend_avg_volume",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estimated_monthly_traffic",
+              "displayName": "estimated_monthly_traffic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "serp_features",
+              "displayName": "serp_features",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "section_source",
+              "displayName": "section_source",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        944,
+        288
+      ],
+      "id": "d612f1d1-c2ac-4ff2-9df7-9bed40692c8f",
+      "name": "Append to Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "K2iUXQtuUAF8v9IT",
+          "name": "Google Sheets account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking 'Execute workflow'": {
+      "main": [
+        [
+          {
+            "node": "Get longtail keywords",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get question keywords",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get similar keywords",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Get related keywords",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get longtail keywords": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get question keywords": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Get similar keywords": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Get related keywords": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Analyze & Score Keywords for Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze & Score Keywords for Content": {
+      "main": [
+        [
+          {
+            "node": "Append to Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e7436c30-ae94-4ce2-8005-4d76ac83b2d8",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1183d366d4439b0dc8255366e7a99e14405a4b582a61d278891dceb1aebf30da"
+  },
+  "id": "Srty7oFBc59e8l5S",
+  "tags": []
+}
