@@ -122,17 +122,23 @@ docker run -it --rm \
 
 ### Updating
 
+**From npm:**
+
+```bash
+npm update @seranking/n8n-nodes-seranking
+```
+
 **From .tgz:**
 
 ```bash
-npm uninstall -g n8n-nodes-seranking
-npm install -g n8n-nodes-seranking-NEW-VERSION.tgz
+npm uninstall -g seranking-n8n-nodes-seranking
+npm install -g seranking-n8n-nodes-seranking-NEW-VERSION.tgz
 ```
 
 **From GitHub:**
 
 ```bash
-npm update -g n8n-nodes-seranking
+npm install -g git+https://github.com/seranking/n8n-nodes-seranking.git
 ```
 
 **From source:**

@@ -35,7 +35,7 @@ Automate comprehensive technical SEO audits with SE Ranking's Website Audit API.
 ### Installation Steps
 
 1. **Import the Workflow**
-   - Download `WebsiteAuditMonitor.json` from this folder
+   - Download `Website-Audit-Technical-SEO-Monitor.json` from this folder
    - In n8n: **Workflows → Import from File**
    - Select the downloaded JSON file
 
