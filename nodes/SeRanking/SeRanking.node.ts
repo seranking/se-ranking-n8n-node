@@ -4,6 +4,7 @@ import {
 	INodeType,
 	INodeTypeDescription,
 	NodeOperationError,
+	NodeConnectionTypes,
 } from 'n8n-workflow';
 
 // Import Data API descriptions
@@ -37,8 +38,9 @@ export class SeRanking implements INodeType {
 		defaults: {
 			name: 'SE Ranking',
 		},
-		inputs: ['main'],
-		outputs: ['main'],
+		usableAsTool: true,
+		inputs: [NodeConnectionTypes.Main],
+		outputs: [NodeConnectionTypes.Main],
 		credentials: [
 			{
 				name: 'seRankingApi',

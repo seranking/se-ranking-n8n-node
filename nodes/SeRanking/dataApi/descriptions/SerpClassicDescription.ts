@@ -110,7 +110,7 @@ export const serpClassicFields: INodeProperties[] = [
 				operation: ['addTasks'],
 			},
 		},
-		default: '',
+		default: 0,
 		placeholder: '31808',
 		description:
 			'Location identifier (integer) — retrieve IDs from the Get Locations endpoint.',

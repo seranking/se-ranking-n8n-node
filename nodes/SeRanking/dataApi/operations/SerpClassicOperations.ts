@@ -1,6 +1,6 @@
 import { IExecuteFunctions } from 'n8n-workflow';
 import { apiRequest } from '../../utils/apiRequest';
-import { validateDateFormat } from '../../utils/validators';
+
 
 /**
  * Parse keywords: supports newline or comma-separated input, enforces API limits.

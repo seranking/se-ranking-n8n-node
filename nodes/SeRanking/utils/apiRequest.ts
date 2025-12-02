@@ -40,11 +40,6 @@ export async function apiRequest(
         }
         
         options.url = `${baseUrl}${endpoint}`;
-        
-        options.headers = {
-            'Authorization': `Token ${credentials.apiToken}`,
-        };
-        
         options.json = true;
     }
 
@@ -106,7 +101,11 @@ export async function apiRequest(
 
     try {
         // Use n8n's httpRequest helper (handles multipart/form-data automatically)
-        const response = await this.helpers.httpRequest(options);
+        const response = await this.helpers.httpRequestWithAuthentication.call(
+        this,
+        'seRankingApi',
+        options
+        );
         return response;
     } catch (error: any) {
         // Enhanced error handling with detailed context
@@ -148,15 +147,6 @@ export async function apiRequest(
             errorMessage = errorData?.message || errorData?.error || error.message || 'Request failed';
         }
         
-        console.error('SE Ranking API Error:', {
-            status: statusCode,
-            message: errorMessage,
-            url: options.url,
-            method: options.method,
-            params: options.qs,
-            itemIndex,
-            errorData,
-        });
         
         throw new NodeOperationError(
             this.getNode(),
