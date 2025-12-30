@@ -180,7 +180,7 @@ The node will automatically test your credentials by making a test request to th
 
 ## Operations
 
-This node provides access to 6 SE Ranking resources with 59 total operations:
+This node provides access to 6 SE Ranking resources with 62 total operations:
 
 ### AI Search (4 operations)
 
@@ -217,13 +217,16 @@ This node provides access to 6 SE Ranking resources with 59 total operations:
 - Get Page Authority - Page-level authority
 - Get Page Authority History - Historical authority tracking
 
-### Domain Analysis (8 operations)
+### Domain Analysis (11 operations)
 
 - Get Regional Database Overview - Regional performance data
 - Get Worldwide Aggregate - Global domain statistics
+- Get Worldwide Aggregate for URL - URL-level global performance
 - Get Overview History - Historical metrics tracking
 - Get Keywords - Ranking keywords with filters
 - Get Keywords Comparison - Domain vs competitor analysis
+- Get Domain Pages - Page-level keyword and traffic metrics
+- Get Domain Subdomains - Subdomain performance analysis
 - Get Competitors - Identify competing domains
 - Get Paid Ads for Keyword - Advertisers on keywords
 - Get Paid Ads for Domain - Domain's advertising keywords
@@ -425,7 +428,18 @@ For detailed API specifications, visit [SE Ranking API Documentation](https://se
 
 ## Version History
 
-### v1.3.0 (Current)
+## Version History
+
+### v1.3.3 (Current)
+
+- ✅ **NEW: Get Worldwide Aggregate for URL** - URL-level global performance metrics
+- ✅ **NEW: Get Domain Pages** - Page-level keyword and traffic analysis with intent breakdown
+- ✅ **NEW: Get Domain Subdomains** - Subdomain traffic and keyword metrics
+- ✅ **Total: 62 operations across 6 resources**
+- ✅ Advanced filtering for pages/subdomains (traffic %, keywords count, traffic sum)
+- ✅ Search intent breakdown (Informational, Navigational, Transactional, Commercial, Local)
+
+### v1.3.0 
 
 - ✅ Complete AI Search resource (4 operations)
 - ✅ Complete Backlinks resource (25 operations)
@@ -479,7 +493,7 @@ For detailed API specifications, visit [SE Ranking API Documentation](https://se
 
 ## Features
 
-✅ **59 Operations** - Comprehensive coverage across 6 major resources  
+✅ **62 Operations** - Comprehensive coverage across 6 major resources  
 
 ✅ **Type Safety** - Full TypeScript implementation with strict typing  
 

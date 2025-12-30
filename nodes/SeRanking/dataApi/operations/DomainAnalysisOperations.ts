@@ -57,6 +57,85 @@ export async function DomainAnalysisOperations(
 			return response;
 		}
 
+		case 'getWorldwideAggregateUrl': {
+			const url = this.getNodeParameter('url', index) as string;
+			const additionalFields = this.getNodeParameter('additionalFields', index, {}) as any;
+			
+			if (!url || url.trim() === '') {
+				throw new Error('URL cannot be empty');
+			}
+			if (!url.match(/^https?:\/\//i)) {
+				throw new Error('URL must include http:// or https://');
+			}
+			
+			endpoint = '/domain/overview/worldwide/url';
+			params.url = url.trim();
+			
+			if (additionalFields.fields) params.fields = additionalFields.fields.join(',');
+			break;
+		}
+
+		case 'getDomainPages': {
+			const target = this.getNodeParameter('target', index) as string;
+			const source = this.getNodeParameter('source', index) as string;
+			const type = this.getNodeParameter('type', index) as string;
+			const scope = this.getNodeParameter('scope', index, 'base_domain') as string;
+			const additionalFields = this.getNodeParameter('additionalFields', index, {}) as any;
+			
+			endpoint = '/domain/pages';
+			params.target = validateDomain(target);
+			params.source = validateSource(source);
+			params.type = type;
+			params.scope = scope;
+			
+			if (additionalFields.limit) params.limit = additionalFields.limit;
+			if (additionalFields.offset) params.offset = additionalFields.offset;
+			if (additionalFields.orderField) params.order_field = additionalFields.orderField;
+			if (additionalFields.orderType) params.order_type = additionalFields.orderType;
+			
+			// Filters
+			if (additionalFields.filterDomainUrl) params['filter[domain_url]'] = additionalFields.filterDomainUrl;
+			if (additionalFields.trafficPercentFrom) params['filter[domain_traffic_percent][from]'] = additionalFields.trafficPercentFrom;
+			if (additionalFields.trafficPercentTo) params['filter[domain_traffic_percent][to]'] = additionalFields.trafficPercentTo;
+			if (additionalFields.keywordsCountFrom) params['filter[keywords_count][from]'] = additionalFields.keywordsCountFrom;
+			if (additionalFields.keywordsCountTo) params['filter[keywords_count][to]'] = additionalFields.keywordsCountTo;
+			if (additionalFields.trafficSumFrom) params['filter[traffic_sum][from]'] = additionalFields.trafficSumFrom;
+			if (additionalFields.trafficSumTo) params['filter[traffic_sum][to]'] = additionalFields.trafficSumTo;
+			if (additionalFields.priceSumFrom) params['filter[price_sum][from]'] = additionalFields.priceSumFrom;
+			if (additionalFields.priceSumTo) params['filter[price_sum][to]'] = additionalFields.priceSumTo;
+			break;
+		}
+
+		case 'getDomainSubdomains': {
+			const target = this.getNodeParameter('target', index) as string;
+			const source = this.getNodeParameter('source', index) as string;
+			const type = this.getNodeParameter('type', index) as string;
+			const additionalFields = this.getNodeParameter('additionalFields', index, {}) as any;
+			
+			endpoint = '/domain/subdomains';
+			params.target = validateDomain(target);
+			params.source = validateSource(source);
+			params.type = type;
+			params.scope = 'base_domain'; // Subdomains only works with base_domain
+			
+			if (additionalFields.limit) params.limit = additionalFields.limit;
+			if (additionalFields.offset) params.offset = additionalFields.offset;
+			if (additionalFields.orderField) params.order_field = additionalFields.orderField;
+			if (additionalFields.orderType) params.order_type = additionalFields.orderType;
+			
+			// Filters
+			if (additionalFields.filterDomainUrl) params['filter[domain_url]'] = additionalFields.filterDomainUrl;
+			if (additionalFields.trafficPercentFrom) params['filter[domain_traffic_percent][from]'] = additionalFields.trafficPercentFrom;
+			if (additionalFields.trafficPercentTo) params['filter[domain_traffic_percent][to]'] = additionalFields.trafficPercentTo;
+			if (additionalFields.keywordsCountFrom) params['filter[keywords_count][from]'] = additionalFields.keywordsCountFrom;
+			if (additionalFields.keywordsCountTo) params['filter[keywords_count][to]'] = additionalFields.keywordsCountTo;
+			if (additionalFields.trafficSumFrom) params['filter[traffic_sum][from]'] = additionalFields.trafficSumFrom;
+			if (additionalFields.trafficSumTo) params['filter[traffic_sum][to]'] = additionalFields.trafficSumTo;
+			if (additionalFields.priceSumFrom) params['filter[price_sum][from]'] = additionalFields.priceSumFrom;
+			if (additionalFields.priceSumTo) params['filter[price_sum][to]'] = additionalFields.priceSumTo;
+			break;
+		}
+
 		case 'getOverviewHistory': {
 			const domain = this.getNodeParameter('domain', index) as string;
 			const source = this.getNodeParameter('source', index) as string;
