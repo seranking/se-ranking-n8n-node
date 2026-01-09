@@ -1,5 +1,9 @@
 import { IExecuteFunctions, NodeOperationError, IHttpRequestOptions, IHttpRequestMethods } from 'n8n-workflow';
 
+// Rate limiting variables
+let lastRequestTime = 0;
+const MIN_REQUEST_INTERVAL = 300; // 300ms 
+
 export async function apiRequest(
     this: IExecuteFunctions,
     method: string,
@@ -8,6 +12,15 @@ export async function apiRequest(
     query: any = {},
     itemIndex = 0
 ): Promise<any> {
+    // Rate limiting: enforce minimum delay between requests
+    const now = Date.now();
+    const timeSinceLastRequest = now - lastRequestTime;
+    if (timeSinceLastRequest < MIN_REQUEST_INTERVAL) {
+        const waitTime = MIN_REQUEST_INTERVAL - timeSinceLastRequest;
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+    }
+    lastRequestTime = Date.now();
+    
     const credentials = await this.getCredentials('seRankingApi');
     
     // Cast method to IHttpRequestMethods early
@@ -15,7 +28,7 @@ export async function apiRequest(
     
     const options: IHttpRequestOptions = {
         method: httpMethod,
-        timeout: 120000,
+        timeout: 60000,
         url: '',
     };
 
@@ -130,7 +143,8 @@ export async function apiRequest(
             errorDescription = 'Domain may not exist in SE Ranking database or export file expired';
         } else if (statusCode === 429) {
             errorMessage = 'Rate Limit Exceeded';
-            errorDescription = 'Too many requests. Add delays between requests or reduce batch size';
+            const retryAfter = error.response?.headers?.['retry-after'] || error.response?.headers?.['Retry-After'] || 60;
+            errorDescription = `Too many requests. SE Ranking requires you to wait ${retryAfter} seconds. The node now automatically adds 300ms delay between requests, but SE Ranking may have additional hourly/daily limits.`;
         } else if (statusCode === 500 || statusCode === 502 || statusCode === 503) {
             errorMessage = 'SE Ranking Server Error';
             errorDescription = 'SE Ranking API is experiencing issues. Try again in a few minutes';
@@ -142,7 +156,7 @@ export async function apiRequest(
             errorDescription = 'Cannot reach SE Ranking API. Check your internet connection';
         } else if (error.code === 'ETIMEDOUT' || error.message?.includes('timeout')) {
             errorMessage = 'Request Timeout';
-            errorDescription = 'Request exceeded 120 seconds. Try with fewer items or use a faster operation';
+            errorDescription = 'Request exceeded 60 seconds. Try with fewer items or use a faster operation';
         } else {
             errorMessage = errorData?.message || errorData?.error || error.message || 'Request failed';
         }

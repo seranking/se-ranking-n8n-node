@@ -18,7 +18,7 @@ export async function AiSearchOperations(
 			const source = this.getNodeParameter('source', index) as string;
 			const scope = this.getNodeParameter('scope', index, 'base_domain') as string;
 			
-			endpoint = '/ai-search/overview';
+			endpoint = '/ai-search/overview/by-engine/time-series';
 			params.target = validateDomain(domain);
 			params.engine = engine;
 			params.source = validateSource(source);
